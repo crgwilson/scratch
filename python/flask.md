@@ -19,87 +19,132 @@ db = SQLAlchemy()
 db.init_app(app)
 ```
 
+### Flask-Restful
+
+Flask-restful provides classes to quickly slap together web APIs which work with
+your existing ORM while also trying to encourage best practices of Restful services.
+
+#### Flask-Restful: Basic usage
+
+Heres a super basic example from their docs...
+
+```python
+# my_project/app.py
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+class HellowWorld(Resource):
+    def get(self):
+      return {"hello": "world"}
+
+api.add_resource(HellowWorld, "/")
+
+if __name__ == "__main__":
+    app.run(debug=True)
+```
+
+In this example the `HellowWorld` class is what will be called when a request is
+made to the endpoint `/` each method of this class maps to the respective method
+of the REST request they are responsible for. For most resources you'd be looking
+to add methods like:
+
+* `get()`
+* `post()`
+* `put()`
+* `delete()`
+
+#### Flask-Restful: Accepting arguments
+
+Here is an example of a resource which will accept `node_id` as an argument...
+
+```python
+# my_project/app.py
+from flask import Flask
+from flask_restful import Resource, Api
+
+app = Flask(__name__)
+api = Api(app)
+
+class User(Resource):
+    def get(self, user_id):
+        return {"received": user_id}
+
+api.add_resource(Users, "/users/<int:user_id>, endpoint="user")
+```
+
+This is similar to flask's out-of-the-box support for routing arguments
+with the `route` decorator. The above `api.add_resource...` line is
+equivalent to using `@app.route("/users/<user_id>")`.
+
+Much like when using the decorator, the argument extracted from the request
+URL will be given to the appropriate method as an argument (note the `get` method
+expecting a `user_id` to be passed).
+
+You can do this with an arbitrary number of arguments or leverage the
+`marshal_with` decorator which I will not be covering.
+
+#### Flask-Restful: Using Blueprints
+
+My preferred way to use `flask-restful` is to add my resources to blueprints
+to be registered with my `app`.
+
+Heres an example of how to do that...
+
+```python
+# my_project/user/views.py
+from flask import Blueprint
+from flask_restful import Api, Resource
+
+bp = Blueprint("users", __name__)
+api = Api(bp)
+
+
+class Users(resource):
+    def get(self, node_id):
+        return {"received": user_id}
+
+
+api.add_resource(Users, "/users/<int:user_id>, endpoint="user")
+# my_project/app.py
+from flask import Flask
+from my_project.users import bp as user_blueprint
+
+
+app = Flask(__name__)
+url_prefix = "/api/v1"
+app.register_blueprint(user_blueprint, url_prefix=url_prefix)
+app.run()
+```
+
+#### Flask-Restful: Field validation
+
+Flask-restful also has a few objects which can be used in concert with
+the `@marshal_with` decorator to validate the body of a given request,
+but I prefer to use [marshmallow](https://marshmallow.readthedocs.io/en/stable/)
+for that, so I won't be going into any detail here. Refer to the docs for more info.
+
+#### Flask-Restful: Further reading
+
+[Flask-Restful Docs](https://flask-restful.readthedocs.io/en/latest/)
+
 ### Flask-SQLAlchemy
 
 Since `flask-sqlalchemy` is basically just a wrapper to combine Flask and SQLAlchemy
 much of this is not Flask specific and could be leveraged with straight SQLAlchemy.
 
+#### Flask-SQLAlchemy: Further reading
+
+[My SQLAlchemy notes](sqlalchemy.md)
 [Flask-SQLAlchemy Docs](https://flask-sqlalchemy.palletsprojects.com/en/2.x/)
 [SQLAlchemy Docs](https://docs.sqlalchemy.org/en/13/)
 
-#### Models
+### Flask-Migrate
 
 TODO
 
-#### Queries
+### Marshmallow
 
-Basic SQL queries are pretty easy to put together with SQLAlchemy. You can get a
-query object from your current DB session and filter that as necessary.
-
-This super simple example query...
-
-```sql
-SELECT * FROM users WHERE id = '10';
-```
-
-...would translate to...
-
-```python
-from myapp.extensions import db  # db = flask_sqlalchemy.SQLAlchemy()
-from myapp.users.models import UserModel
-
-db.session.query(UserModel).filter(UserModel.id == 10).first()
-```
-
-...and this query...
-
-```sql
-SELECT id FROM users WHERE name LIKE "%bob&";
-```
-
-...would be...
-
-```python
-from myapp.extensions import db  # db = flask_sqlalchemy.SQLAlchemy()
-from myapp.users.models import UserModel
-
-db.session.query(UserModel.id).filter(UserModel.id.like("%bob%")).all()
-```
-
-We can do something a little more complicated too. Here is an example
-using a nested query...
-
-```sql
-SELECT
-  *
-FROM
-  child
-WHERE
-  name = 'bob junior'
-AND
-  parent_id=(SELECT id FROM parent WHERE name='bob');
-```
-
-...would be...
-
-```python
-from sqlalchemy import and_
-
-from myapp.extensions import db  # db = flask_sqlalchemy.SQLAlchemy()
-from myapp.parents.models import ParentModel
-from myapp.children.models import ChildModel
-
-session = db.session
-
-sub_query = session.query(ParentModel.id).filter(ParentModel.name == "bob").subquery()
-query = session.query(ChildModel).filter(
-  and_(
-    ChildModel.name == "bob junior",
-    ChildModel.parent_id.in_(sub_query)
-  )
-)
-```
-
-...note that we're using the `sqlalchemy.and_` function here to match the `AND`
-keyword in regular SQL. If we wanted to do an `OR` instead we could use the
-(hopefully obvious) `sqlalchemy.or_` function instead.
+TODO
