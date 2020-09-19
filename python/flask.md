@@ -3,7 +3,7 @@
 Quick & dirty collection of thoughts on using the Flask web framework for
 backend development with python.
 
-## Extensions
+## Flask: Extensions
 
 Flask extensions are plugins which provide additional functionality for your web
 application. Extensions need to be initialized and added to your flask app as shown
@@ -144,6 +144,70 @@ much of this is not Flask specific and could be leveraged with straight SQLAlche
 ### Flask-Migrate
 
 TODO
+
+## Flask: Testing
+
+Flask apps have a built-in Werkzeug test client which can be used within unit tests.
+The below `pytest` example will...
+
+* Initialize our App using a config object
+* Provision a fresh database instance and provide a valid session
+* return a test client to use within unit tests
+
+```python
+# myproject/tests/conftest.py
+import pytest
+
+from my_project.app import create_app
+from my_project.config import MyAppConfig
+from my_app.database import db as app_db
+
+
+@pytest.yield_fixture(scope="session")
+def app(request):
+    flask_app = create_app(MyAppConfig())
+    ctx = flask_app.app_context()
+    ctx.push()
+
+    yield flask_app
+
+    ctx.pop()
+
+
+@pytest.fixture(scope="session")
+def db(app, request):
+    app_db.drop_all()
+    app_db.create_all()
+
+    app_db.app = app
+    yield app_db
+
+    app_db.drop_all()
+
+
+@pytest.yield_fixture(scope="function")
+def session(db, request):
+    db.session.begin_nested()
+    yield db.session
+    db.session.rollback()
+
+
+@pytest.fixture(scope="function")
+def client(app, session):
+    with app.test_client() as c:
+        yield c
+
+
+# myproject/tests/test_user_endpoint.py
+def test_users_get(client):
+    response = client.get("/api/v1/users")
+
+    assert response.status_code == 200
+```
+
+### Flask Testing: Further reading
+
+[Testing Flask Applications](https://flask.palletsprojects.com/en/1.1.x/testing/)
 
 ### Marshmallow
 
