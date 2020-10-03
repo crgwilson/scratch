@@ -77,6 +77,35 @@ query = session.query(ChildModel).filter(
 keyword in regular SQL. If we wanted to do an `OR` instead we could use the
 (hopefully obvious) `sqlalchemy.or_` function instead.
 
+## Inserting reference data
+
+If you have a need to insert a few static records into a table one-time during
+initialization, you can do so with the `sqlalchemy.event.listen` function.
+
+```python
+from sqlalchemy.event import listen
+
+from myapp.database import db
+
+
+class User(db.Model):
+    __tablename__ = "user"
+
+    id = db.Column(db.Integer, primary_key=True)
+
+    profile_name = db.Column(db.String(50), nullable=False, unique=True)
+    first_name = db.Column(db.String(50), nullable=False)
+    last_name = db.Column(db.String(50), nullable=False)
+
+
+def insert_default_users(*args, **kwargs):
+    db.session.add(User(id=1, profile_name="admin", first_name="Systems", last_name="Administrator"))
+    db.session.commit()
+
+
+listen(User.__table__, "after_create", insert_default_users)
+```
+
 ## Further reading
 
 * [SQLAlchemy Docs](https://docs.sqlalchemy.org/en/13/)
