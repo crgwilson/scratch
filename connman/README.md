@@ -13,6 +13,7 @@ All the info below has been gathered from the arch wiki page and the connman doc
 ### Cheatsheet: Commands
 
 | Command | Purpose |
+| ------- | ------- |
 | `connmanctl` | Command line operations |
 | `connmand` | Manage the connman daemon |
 
