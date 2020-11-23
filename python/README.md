@@ -4,7 +4,8 @@ Notes on anything python related
 
 ## Index
 
-* [Type annotations](typing.md)
 * [dbus-python](dbus.md)
 * [Flask](flask.md)
+* [functools](functools.md)
 * [SQLAlchemy](sqlalchemy.md)
+* [Type annotations](typing.md)
