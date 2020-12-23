@@ -26,6 +26,12 @@ so %
 :messages
 ```
 
+### View the contents of a table
+
+```vim
+lua print(vim.inspect(vim.api.something_that_gives_me_a_table()))
+```
+
 ### Please won't somebody help me
 
 ```vim
@@ -40,4 +46,10 @@ so %
 
 ```vim
 :lua print(vim.inspect(vim.api.nvim_list_uis()[1]))
+```
+
+### Get the current buffer filetype (in lua)
+
+```vim
+lua print(vim.api.nvim_buf_get_option(0, "filetype"))
 ```
