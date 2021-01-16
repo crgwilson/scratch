@@ -42,6 +42,28 @@ system_bus = dbus.SystemBus()
 system.get_object("org.ganesha.nfsd", "/org/ganesha/nfsd/ExportMgr")
 ```
 
+## dbus-python: Introspection
+
+You can inspect objects retrieved via dbus using the `org.freedesktop.DBus.Introspectable`
+dbus interface
+
+```python
+import dbus
+
+bus = dbus.SystemBus()
+
+dbus_obj = bus.get_object(
+    "org.some.service",
+    "/org/some/service/object",
+)
+
+introspection_interface = dbus.Interface(dbus_obj, "org.freedesktop.DBus.Introspectable")
+
+print(introspection_interface.SomeMethod())
+```
+
+...this example will give you some xml output describing the object provided.
+
 ## dbus-python: Calling methods
 
 Once you have an instance of your object all DBUS methods will be accessible on it.
@@ -72,6 +94,52 @@ eth0 = bus.get_object(
 eth0_dev_iface = dbus.Interface(eth0, dbus_interface='org.freedesktop.NetworkManager.Devices')
 props = eth0_dev_iface.getProperties()
 # props is the same as before
+```
+
+...or...
+
+```python
+import dbus
+bus = dbus.SystemBus()
+eth0 = bus.get_object(
+    'org.freedesktop.NetworkManager',
+    '/org/freedesktop/NetworkManager/Devices/eth0'
+)
+
+get_properties_method = eth0.get_dbus_method(\
+    'getProperties',  # The method name
+    'org.freedesktop.NetworkManager.Devices',  # The dbus interface
+)
+
+# If this method is expecting params, add them here
+output = get_properties_method()
+```
+
+...calling methods will return `dbus.Struct` objects which are represented as
+python tuples. You will need to either do some exploration with the dbus
+introspection interface (see above section), or the documentation for your
+dbus API to determine which tuple index maps to which object property.
+
+```python
+import dbus
+
+system_bus = dbus.SystemBus()
+export_manager = system_bus.get_object(
+    "org.ganesha.nfsd",
+    "/org/ganesha/nfsd/ExportMgr",
+)
+
+show_exports_method = export_manager.get_dbus_method(
+    "ShowExports",
+    "org.ganesha.nfsd.exportmgr",
+)
+
+output = show_exports_method()
+exports = output[1]
+
+for export in exports:
+    for prop in export:
+        print(prop)
 ```
 
 ## dbus-python: Debugging
