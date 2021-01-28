@@ -4,6 +4,7 @@ Notes on anything python related
 
 ## Index
 
+* [collections](collections.md)
 * [dbus-python](dbus.md)
 * [Flask](flask.md)
 * [functools](functools.md)
