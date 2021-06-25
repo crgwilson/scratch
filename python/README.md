@@ -4,6 +4,7 @@ Notes on anything python related
 
 ## Index
 
+* [argparse](argparse.md)
 * [collections](collections.md)
 * [dbus-python](dbus.md)
 * [Flask](flask.md)
