@@ -10,5 +10,6 @@ Notes on anything python related
 * [Flask](flask.md)
 * [functools](functools.md)
 * [pytest](pytest.md)
+* [re](re.md)
 * [SQLAlchemy](sqlalchemy.md)
 * [Type annotations](typing.md)
