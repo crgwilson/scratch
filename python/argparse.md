@@ -8,6 +8,7 @@ Write CLIs without having to install `click`
 # cli/cli.py
 import argparse
 
+
 def cli():
     parser = argparse.ArgumentParser(description="My fun CLI")
     parser.add_argument(
@@ -94,7 +95,7 @@ import argparse
 # create the top-level parser
 parser = argparse.ArgumentParser(prog="PROG")
 parser.add_argument("--foo", action="store_true", help="foo help")
-subparsers = parser.add_subparser(help="sub-command help")
+subparsers = parser.add_subparsers(help="sub-command help")
 
 # create the parser for the "a" command
 parser_a = subparsers.add_parser("a", help="a help")
