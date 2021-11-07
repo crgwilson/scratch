@@ -89,23 +89,31 @@ parser.add_argument("--my-file", type argparse.FileType("r"))
 ## Argparse: Creating sub-parsers / sub-commands
 
 ```python
-# cli/cli.py
+# cli.py
 import argparse
 
 # create the top-level parser
 parser = argparse.ArgumentParser(prog="PROG")
-parser.add_argument("--foo", action="store_true", help="foo help")
+parser.add_argument("--debug", action="store_true", default=False, help="foo help")
+
 subparsers = parser.add_subparsers(help="sub-command help")
 
-# create the parser for the "a" command
-parser_a = subparsers.add_parser("a", help="a help")
-parser_a.add_argument("bar", type=int, help="bar help")
+# common args between multiple sub-commands
+common_parser = argparse.ArgumentParser(add_help=False)
+common_parser.add_argument(
+    "--foo", required=True, help="This arg is required for all subcommands"
+)
 
-# create the parser for the "b" command
-parser_b = subparsers.add_parser("B", help="b help")
-parser_b.add_argument("--baz", choices=["X", "Y", "Z"], help="baz help")
+# sub-command including the common args
+sub = subparsers.add_parser(
+    "sub", parents=[common_parser], help="this is my actual sub-command"
+)
+sub.add_argument(
+    "--bar", type=int, required=True, help="This arg is specific to this command"
+)
+sub.add_argument("--baz", choices=["X", "Y", "Z"], help="baz help")
 
-# parse some argument lists
+# parse all our args
 parser.parse_args()
 ```
 
