@@ -61,7 +61,7 @@ repositories {
 
 jar {
   manifest {
-    attributes 'Main-Class': 'somepackage.helloWorld'
+    attributes 'Main-Class': 'com.somepackage.helloWorld'
   }
 }
 ```
