@@ -7,6 +7,12 @@ It's big and complicated.
 ## Gradle: Getting started
 
 A new gradle project can be initialized with `gradle init`. It will create a few files in your cwd needed to build a new project.
+This can be done with your system gradle, but in all cases you'll want to also create your gradle wrapper. The gradle wrapper script
+can let you use different versions of gradle without having to manually install different packages everywhere.
+
+`gradle wrapper --gradle-version 7.6`
+
+From there, you can use your local environment's gradle by calling `gradlew <task name>`
 ```
 ├── build.gradle
 ├── gradle

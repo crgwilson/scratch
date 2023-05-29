@@ -7,3 +7,4 @@ Notes on anything java related
 * [Basics](basics.md)
 * [Maven](maven.md)
 * [Gradle](gradle.md)
+* [JUnit](junit.md)
