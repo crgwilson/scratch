@@ -8,3 +8,4 @@ Notes on anything java related
 * [Maven](maven.md)
 * [Gradle](gradle.md)
 * [JUnit](junit.md)
+* [TestNG](testng.md)

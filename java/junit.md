@@ -27,7 +27,7 @@ test {
 }
 ```
 
-Your test classes need to be created alongside your java package in a `test` directory.
+Your test classes need to be created alongside your java package in a `test` directory. As per [Apache's Standard Directory Layout](https://maven.apache.org/guides/introduction/introduction-to-the-standard-directory-layout.html)
 ```console
 src
 ├── main
@@ -51,15 +51,15 @@ package com.helloworld;
 import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
-public class TestHelloWorld {
-  @Test
-  public void testHelloWorld() {
-    HelloWorld testObject = new HelloWorld();
+public class testhelloworld {
+  @test
+  public void testhelloworld() {
+    helloworld testobject = new helloworld();
 
-    String got = testObject.sayHello();
-    String expected = "Hello world";
+    string got = testobject.sayhello();
+    string expected = "hello world";
 
-    assertEquals("sayHello should say hello", expected, got);
+    assertequals("sayhello should say hello", expected, got);
   }
 }
 ```
