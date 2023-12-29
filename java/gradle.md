@@ -72,6 +72,17 @@ jar {
 }
 ```
 
+Or, the better way to do this is with the `application` plugin.
+```groovy
+plugins {
+    id 'application'
+}
+
+application {
+    mainClass = 'com.somepackage.helloWorld'
+}
+```
+
 ### Gradle: `settings.gradle`
 
 The `settings.gradle` file is used for multi-project repos. When multiple directories are contained within the scope of one project
