@@ -1,7 +1,5 @@
 # Algorithms
 
-# Basics
-
 ## Big O Time Complexity
 
 Big O categorizes your algorithm's time or memory requirements based on input. It is not meant to be an exact measurement. As your input grows how fast does your computation or memory grow?
@@ -16,7 +14,7 @@ function sum_char_codes(n: string): number {
     return sum;
 }
 ```
-...is O(N) as it grows linearly. If the length of input string `n`, increases in length by 50%, our function will take roughly 50% longer since we're looping through it.
+...is **O(N)** as it grows linearly. If the length of input string `n`, increases in length by 50%, our function will take roughly 50% longer since we're looping through it.
 
 Time Complexities
 
@@ -67,8 +65,22 @@ System.out.println(foo[2]);  // Get the value at the 2nd index in array `foo`
 
 Arrays don't reallocate themselves and dynamically grow / shrink. Therefore you never really "insert" you overwrite, and you never "delete" you null / zero out the index IE: set the value to a sentinel value (falsey).
 
-* Retrieving a value knowing the index is O(1)
-* Retrieving a value not knowing the index is O(N)
+* Retrieving a value knowing the index is **O(1)**
+* Retrieving a value not knowing the index is **O(N)**
+
+### ArrayList
+
+ArrayLists are wrappers on top of arrays which reallocate the underlying array when capacity is reached.
+
+### ArrayBuffer / RingBuffer
+
+An ArrayBuffer uses an array as its underlying data structure, but given an Array of size N, we are not using index 0 as head and N as tail, separate head and tail indicies are tracked. This means we can use this for queue like operations without needing to shift every element in the array. Additionally, ArrayBuffers / RingBuffers / whatever you want to call them maintain element order.
+
+If the array size is exceeded, the tail will wrap around to index 0.
+
+Issues happen when your tail exceeds your head, meaning you need to reallocate and shift the whole data structure.
+
+A good use case for an ArrayBuffer log collection and batched flushing.
 
 ## Linear Search
 
@@ -91,13 +103,92 @@ for (int i; i < haystack.length; i++) {
 }
 ```
 
+## Sorting
+
+### Bubble Sort
+
+The simplest sort **O(N^2)**.
+
+* Start in the 0th position and go to the end of the array
+* If i+1 > i, swap positions
+* If you reach the end and a swap occurred run again
+
+```java
+int[] haystack = {1, 3, 7, 4, 2};
+boolean sorted = false;
+
+while (!sorted) {
+    for (int i = 0; i < haystack.length; i++;) {
+        for (int j = 0; j < haystack.length - 1; j++;) {
+            if (haystack[j] > haystack[j + 1]) {
+                int tmp = haystack[j];
+                haystack[j] = haystack[j + 1];
+                haystack[j + 1] = tmp;
+            }
+        }
+    }
+}
+```
+
+### Quicksort
+
+Divide and conquer.
+
+Split input into N chunks, and run through those smaller subsets to solve things faster **O(LogN)** optimistically. Pessimistically, (reverse sorted array), it will be O(N^2).
+
+Split an array at a Pivot point, and sort it so every element to the left is less than or equal to the pivot, and everything to the right is greater than the pivot. Then, select two more pivots, one to the left, and one to the right, and repeat until it's sorted.
+
+```java
+private void qs(int[] arr, int low, int high) {
+    if (low => high) {
+        return;
+    }
+
+    int privotIdx = partition(arr, low, high);
+    qs(arr, low, pivotIdx - 1);
+    qs(arr, pivotIdx + 1, high);
+}
+
+private int partition(int[] arr, int low, int high) {
+    int pivot = arr[high];
+    int idx = low - 1;
+
+    for (int i = 0; i < high; i++) {
+        if(arr[i] <= pivot) {
+            idx++;
+            int tmp = arr[i];
+            arr[i] = arr[idx];
+            arr[idx] = tmp;
+        }
+    }
+
+    idx++;
+    arr[high] = arr[idx];
+    arr[idx] = pivot;
+
+    return idx;
+}
+
+public void quicksort(int[] arr) {
+    qs(arr, 0, arr.length - 1);
+}
+```
+
+### Merge Sort
+
+TODO
+
+### Insertion Sort
+
+TODO
+
 ## Binary Search
 
 When applicable:
 
 * Is it ordered?
 
-Eliminate half of the total elements resulting in O(LogN)
+Eliminate half of the total elements resulting in **O(LogN)**.
 
 1. Start in the middle of the array
 1. If x > array[i], move up
@@ -124,31 +215,6 @@ public boolean binarySearch(int needle) {
         }
     }
     return false;
-}
-```
-
-## Bubble Sort
-
-The simplest sort O(N^2).
-
-* Start in the 0th position and go to the end of the array
-* If i+1 > i, swap positions
-* If you reach the end and a swap occurred run again
-
-```java
-int[] haystack = {1, 3, 7, 4, 2};
-boolean sorted = false;
-
-while (!sorted) {
-    for (int i = 0; i < haystack.length; i++;) {
-        for (int j = 0; j < haystack.length - 1; j++;) {
-            if (haystack[j] > haystack[j + 1]) {
-                int tmp = haystack[j];
-                haystack[j] = haystack[j + 1];
-                haystack[j + 1] = tmp;
-            }
-        }
-    }
 }
 ```
 
@@ -186,6 +252,12 @@ public interface LinkedList<T> {
 }
 ```
 
+### Array vs Linked List
+
+* Arrays have access via index, linked list does not
+* Arrays don't have a real "insert" without manually implementing for loops to shift over all values
+* Arrays are allocated all up front
+
 ## Queue
 
 Queues are FIFO (first in, first out) data structures. You can insert new elements to the end of the queue, and pop off from the front. These can be implemented using a singly linked list.
@@ -216,7 +288,7 @@ public class Queue<T> {
         this.length++;
         QNode node = new QNode(item);
 
-        if (Objects.isNull(this.tail)) {
+        if (this.tail == null) {
             this.head = node;
             this.tail = this.head;
             return;
@@ -227,7 +299,7 @@ public class Queue<T> {
     }
 
     public Optional<T> dequeue() {
-        if (Objects.isNull(this.head)) {
+        if (this.head == null) {
             return null;
         }
 
@@ -273,7 +345,7 @@ public class Stack {
         this.length++;
 
         SNode<T> node = new SNode(item);
-        if (Objects.isNull(this.head)) {
+        if (this.head == null) {
             this.head = node;
             return;
         }
@@ -283,7 +355,7 @@ public class Stack {
     }
 
     public Optional<T> pop() {
-        if (Objects.isNull(this.head)) {
+        if (this.head == null) {
             return null;
         }
 
@@ -300,3 +372,21 @@ public class Stack {
     }
 }
 ```
+
+## Recursion
+
+Whats always the problem with recursion? Recursion.
+
+Recursion is something which calls itself over and over. The danger with recursion is stack overflows, to get around this use a stack instead.
+
+```java
+public int countToTen(int input) {
+    if (input >= 10) {
+        System.out.println("I'm done!");
+        return input;
+    }
+    return countToTen(input++);
+}
+```
+
+Recursion will be necessary for graph and tree traversal algorithms.
