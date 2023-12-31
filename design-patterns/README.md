@@ -8,7 +8,7 @@
     * Factory Method
     * Prototype
     * Singleton
-* Structural Patterns
+* [Structural Patterns](./structural.md)
     * Adapter
     * Bridge
     * Composite
@@ -16,7 +16,7 @@
     * Facade
     * Flyweight
     * Proxy
-* Behavioral Patterns
+* [Behavioral Patterns](./behavioral.md)
     * Chain of Responsibility
     * Command
     * Interpreter
