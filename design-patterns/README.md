@@ -2,7 +2,7 @@
 
 ## Index
 
-* Creational Patterns
+* [Creational Patterns](./creational.md)
     * Abstract Factory
     * Builder
     * Factory Method
