@@ -5,7 +5,7 @@ Notes on anything java related
 ## Index
 
 * [Basics](basics.md)
-* [Collections](collections.md)
+* [Collections](Java/collections.md)
 * [Functional Programming](functional.md)
 * [Generics](generics.md)
 * [Gradle](gradle.md)

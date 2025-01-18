@@ -1,0 +1,1 @@
+Behavioral Patterns, as described within [[Design Patterns Elements of Reusable Object-Oriented Software]], are concerned with algorithms and the assignment of responsibilities between objects. They describe not just patterns of objects or classes but also the patterns of communication between them.

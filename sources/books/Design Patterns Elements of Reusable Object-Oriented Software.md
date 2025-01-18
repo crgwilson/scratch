@@ -1,2 +1,0 @@
-[[Design Patterns Elements of Reusable Object-Oriented Software]] is a software engineering book describing various [[Software Design Patterns]]. The authors of this book are often referred to as the "Gang of Four", and are commonly cited on the topic of software design.
-![[81IGFC6oFmL.jpg]]

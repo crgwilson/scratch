@@ -1,0 +1,1 @@
+Structural Patterns, as described within [[Design Patterns Elements of Reusable Object-Oriented Software]], are concerned with how classes and objects are composed to form larger structures. They use inheritance to compose interfaces or implementations.

@@ -6,7 +6,7 @@ Notes on anything python related
 
 * [argparse](argparse.md)
 * [asyncio](asyncio.md)
-* [collections](collections.md)
+* [collections](Python/collections.md)
 * [dbus-python](dbus.md)
 * [Flask](flask.md)
 * [functools](functools.md)
