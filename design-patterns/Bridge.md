@@ -2,7 +2,7 @@ The Bridge is one of the [[Creational-Patterns]] described in [[Design Patterns 
 
 Bridges decouple an abstraction from its implementation so that the two can vary independently.
 
-![[Pasted image 20250120113542.png]]
+![[Bridge.png]]
 
 Use a Bridge when:
 
