@@ -21,3 +21,6 @@ for k = 0 to n-1:
 		C(k) = B(j)
 		j++
 ```
+
+#### Sources
+* [[Algorithms Illuminated Omnibus Edition]]
