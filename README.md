@@ -3,7 +3,7 @@
 One location to house the contents of my brain.
 ## Index
 
-* [Algorithms](Algorithms/README.md)
+* [Algorithms](Data-Structures-and-Algorithms/README.md)
 * [ConnMan](Connman/README.md)
 * [Design Patterns](Design-Patterns/README.md)
 * [GPG](GPG/README.md)

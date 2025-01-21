@@ -1,0 +1,1 @@
+Free [Frontend masters course](https://frontendmasters.com/courses/algorithms/) taught by tech youtuber & streamer, [The Primeagen](https://www.youtube.com/c/theprimeagen).
