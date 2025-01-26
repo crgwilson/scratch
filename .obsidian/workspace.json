@@ -8,31 +8,31 @@
         "type": "tabs",
         "children": [
           {
-            "id": "753cde4c171d40f3",
+            "id": "fb117682a945dd71",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Data-Structures-and-Algorithms/Arrays.md",
+                "file": "Data-Structures-and-Algorithms/Tree.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Arrays"
+              "title": "Tree"
             }
           },
           {
-            "id": "4d6df404d505ea7c",
+            "id": "278994a07b289ec5",
             "type": "leaf",
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Data-Structures-and-Algorithms/Bubble-Sort.md",
+                "file": "Data-Structures-and-Algorithms/Tree.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Bubble-Sort"
+              "title": "Tree"
             }
           }
         ],
@@ -48,12 +48,12 @@
             "state": {
               "type": "markdown",
               "state": {
-                "file": "Data-Structures-and-Algorithms/Recursion.md",
+                "file": "Data-Structures-and-Algorithms/Queue.md",
                 "mode": "source",
                 "source": false
               },
               "icon": "lucide-file",
-              "title": "Recursion"
+              "title": "Queue"
             }
           }
         ]
@@ -246,23 +246,28 @@
       "obsidian-excalidraw-plugin:Create new drawing": false
     }
   },
-  "active": "4d6df404d505ea7c",
+  "active": "278994a07b289ec5",
   "lastOpenFiles": [
+    "Excalidraw/BFS.png",
+    "Excalidraw/BFS.excalidraw.md",
+    "Data-Structures-and-Algorithms/Tree.md",
+    "Data-Structures-and-Algorithms/Queue.md",
+    "Data-Structures-and-Algorithms/Recursion.md",
+    "Excalidraw/Tree.png",
+    "Excalidraw/Tree.excalidraw.md",
+    "Data-Structures-and-Algorithms/Stack.md",
+    "Data-Structures-and-Algorithms/Linked-List.md",
+    "Data-Structures-and-Algorithms/Bubble-Sort.md",
     "Excalidraw/Bubble-Sort.png",
     "Excalidraw/Bubble-Sort.excalidraw.md",
     "Excalidraw/Merge-Sort.png",
     "Data-Structures-and-Algorithms/Arrays.md",
     "Data-Structures-and-Algorithms/README.md",
-    "Data-Structures-and-Algorithms/Recursion.md",
     "Data-Structures-and-Algorithms/Big-O-Notation.md",
-    "Data-Structures-and-Algorithms/Bubble-Sort.md",
     "Data-Structures-and-Algorithms/Insertion-Sort.md",
-    "Data-Structures-and-Algorithms/Linked-List.md",
     "Data-Structures-and-Algorithms/Merge-Sort.md",
-    "Data-Structures-and-Algorithms/Queue.md",
     "Data-Structures-and-Algorithms/Quick-Sort.md",
     "Data-Structures-and-Algorithms/Selection-Sort.md",
-    "Data-Structures-and-Algorithms/Stack.md",
     "Tags/Data-Structure.md",
     "Tags/Sorting-Algorithm.md",
     "Excalidraw/Merge-Sort.excalidraw.md",
@@ -274,9 +279,6 @@
     "Design-Patterns/Composite.md",
     "Tags/courses/The Last Algorithms Course You'll Need.md",
     "Design-Patterns/Builder.md",
-    "Tags/Neetcode.io.md",
-    "Algorithms/Arrays.md",
-    "Tags/Untitled.md",
     "Excalidraw/Composite.png",
     "Excalidraw/Bridge.png",
     "static/Pasted image 20250120113542.png",
