@@ -4,6 +4,8 @@ The simplest [[Sorting-Algorithm]], which sorts at **O(N^2)**.
 * If i+1 > i, swap positions
 * If you reach the end and a swap occurred run again
 
+![](../Excalidraw/Bubble-sort.png)
+
 ```java
 int[] haystack = {1, 3, 7, 4, 2};
 boolean sorted = false;
