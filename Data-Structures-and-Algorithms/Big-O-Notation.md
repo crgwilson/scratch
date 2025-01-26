@@ -48,6 +48,6 @@ Step 12 - 1
 * Always assume worst case
 * If you half at each step, it's likely O(LogN) or O(NLogN)
 
-#### Sources
+## Sources
 
 * [[The Last Algorithms Course You'll Need]]

@@ -1,4 +1,4 @@
-Merge sort is the best of [[Selection Sort]], [[Insertion Sort]], and [[Bubble Sort]]. It is a divide and conquer sorting algorithm.
+Merge sort is the best of [[Selection-Sort]], [[Insertion-Sort]], and [[Bubble-Sort]]. It is a divide and conquer [[Sorting-Algorithm]].
 ![[Merge-Sort.png]]
 1. Recursively sort 1st half of input array.
 2. Repeat for 2nd half.
@@ -22,5 +22,6 @@ for k = 0 to n-1:
 		j++
 ```
 
-#### Sources
+## Sources
+
 * [[Algorithms Illuminated Omnibus Edition]]
