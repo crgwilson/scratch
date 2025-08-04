@@ -15,5 +15,6 @@ Notes on anything python related
 * [SQLAlchemy](sqlalchemy.md)
 * [Type annotations](typing.md)
 * [pyproject.toml](pyproject.toml.md)
-* [uv](uv.md)
 * [ruff](ruff.md)
+* [tox](tox.md)
+* [uv](uv.md)
