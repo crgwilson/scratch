@@ -14,3 +14,6 @@ Notes on anything python related
 * [re](re.md)
 * [SQLAlchemy](sqlalchemy.md)
 * [Type annotations](typing.md)
+* [pyproject.toml](pyproject.toml.md)
+* [uv](uv.md)
+* [ruff](ruff.md)
