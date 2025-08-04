@@ -513,3 +513,84 @@ if __name__ == "__main__":
     telemetry_service.shutdown()
     print("Application finished and telemetry shut down.")
 ```
+
+## Auto-Instrumentation for Web Frameworks
+
+OpenTelemetry provides auto-instrumentation for many popular web frameworks, allowing you to automatically collect traces for incoming requests without manual code changes. This is particularly useful for quickly gaining visibility into your application's performance.
+
+### Flask (Python) Auto-Instrumentation
+
+To auto-instrument a Flask application, you'll use the `opentelemetry-instrumentation-flask` package and run your application with the `opentelemetry-instrument` command.
+
+First, install the necessary packages:
+```bash
+pip install opentelemetry-distro opentelemetry-exporter-otlp flask opentelemetry-instrumentation-flask
+```
+
+Then, use `opentelemetry-bootstrap` to install other relevant instrumentation libraries:
+```bash
+opentelemetry-bootstrap -a install
+```
+
+Finally, run your Flask application using `opentelemetry-instrument`:
+```bash
+OTEL_SERVICE_NAME="my-flask-app" \
+OTEL_EXPORTER_OTLP_ENDPOINT="http://localhost:4317" \
+opentelemetry-instrument flask run -p 8080
+```
+
+Replace `flask run -p 8080` with the actual command you use to start your Flask application. You can configure the service name and OTLP exporter endpoint using environment variables.
+
+**Important Considerations:**
+*   Avoid running your Flask app in reloader or hot-reload mode (e.g., `flask run --reload`) when using OpenTelemetry auto-instrumentation, as it can break the instrumentation.
+*   For more fine-grained control or custom telemetry, you can combine auto-instrumentation with manual instrumentation.
+
+### Express (Node.js) Auto-Instrumentation
+
+To auto-instrument an Express.js application, you'll use the `@opentelemetry/auto-instrumentations-node` package and configure the OpenTelemetry SDK to load these instrumentations.
+
+First, install the necessary npm packages:
+```bash
+npm install --save @opentelemetry/api @opentelemetry/sdk-node @opentelemetry/auto-instrumentations-node @opentelemetry/exporter-trace-otlp-http
+```
+
+Create a separate file (e.g., `instrumentation.js`) for your OpenTelemetry setup. This file should be imported and run *before* your main Express application code.
+
+`instrumentation.js`:
+```javascript
+const { NodeSDK } = require('@opentelemetry/sdk-node');
+const { OTLPTraceExporter } = require('@opentelemetry/exporter-trace-otlp-http');
+const { getNodeAutoInstrumentations } = require('@opentelemetry/auto-instrumentations-node');
+const { Resource } = require('@opentelemetry/resources');
+const { SemanticResourceAttributes } = require('@opentelemetry/semantic-conventions');
+
+const traceExporter = new OTLPTraceExporter({
+  // url: 'http://localhost:4318/v1/traces',
+});
+
+const sdk = new NodeSDK({
+  resource: new Resource({
+    [SemanticResourceAttributes.SERVICE_NAME]: 'my-express-app',
+  }),
+  traceExporter: traceExporter,
+  instrumentations: [getNodeAutoInstrumentations()],
+});
+
+sdk.start();
+
+console.log('OpenTelemetry SDK initialized.');
+
+process.on('SIGTERM', () => {
+  sdk.shutdown()
+    .then(() => console.log('OpenTelemetry SDK shut down successfully'))
+    .catch((error) => console.log('Error shutting down OpenTelemetry SDK', error))
+    .finally(() => process.exit(0));
+});
+```
+
+Finally, run your Express application, ensuring `instrumentation.js` is loaded first:
+```bash
+node --require ./instrumentation.js app.js
+```
+
+Replace `app.js` with the path to your main Express application file. This will automatically instrument incoming HTTP requests and send traces to your configured OTLP endpoint.
