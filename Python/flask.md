@@ -36,11 +36,11 @@ from flask_restful import Resource, Api
 app = Flask(__name__)
 api = Api(app)
 
-class HellowWorld(Resource):
+class HelloWorld(Resource):
     def get(self):
-      return {"hello": "world"}
+        return {"hello": "world"}
 
-api.add_resource(HellowWorld, "/")
+api.add_resource(HelloWorld, "/")
 
 if __name__ == "__main__":
     app.run(debug=True)
@@ -72,7 +72,7 @@ class User(Resource):
     def get(self, user_id):
         return {"received": user_id}
 
-api.add_resource(Users, "/users/<int:user_id>, endpoint="user")
+api.add_resource(User, "/users/<int:user_id>", endpoint="user")
 ```
 
 This is similar to flask's out-of-the-box support for routing arguments
@@ -102,15 +102,15 @@ bp = Blueprint("users", __name__)
 api = Api(bp)
 
 
-class Users(resource):
-    def get(self, node_id):
+class Users(Resource):
+    def get(self, user_id):
         return {"received": user_id}
 
 
-api.add_resource(Users, "/users/<int:user_id>, endpoint="user")
+api.add_resource(Users, "/users/<int:user_id>", endpoint="user")
 # my_project/app.py
 from flask import Flask
-from my_project.users import bp as user_blueprint
+from my_project.user.views import bp as user_blueprint
 
 
 app = Flask(__name__)
@@ -145,6 +145,40 @@ much of this is not Flask specific and could be leveraged with straight SQLAlche
 
 TODO
 
+## Flask: Application Factory
+
+The application factory pattern is the recommended way to structure a Flask application. Instead of creating a global `app` object, you create it inside a function, `create_app`. This approach has several advantages:
+
+*   **Improved Testing**: You can create multiple instances of your application with different configurations for testing.
+*   **Avoiding Circular Imports**: It helps manage dependencies and avoids circular import problems with extensions and blueprints.
+*   **Scalability**: It makes the application more modular and easier to scale.
+
+Here is an example of a `create_app` function that ties together the configuration, extensions, and blueprints.
+
+```python
+# my_project/app.py
+from flask import Flask
+from my_project.config import MyAppConfig
+from my_project.database import db
+from my_project.user.views import bp as user_blueprint
+
+def create_app(config_object=MyAppConfig()):
+    """An application factory, as described in the Flask documentation."""
+    app = Flask(__name__)
+    app.config.from_object(config_object)
+
+    # Initialize extensions
+    db.init_app(app)
+
+    # Register blueprints
+    url_prefix = "/api/v1"
+    app.register_blueprint(user_blueprint, url_prefix=url_prefix)
+
+    return app
+```
+
+This `create_app` function can then be used by your test suite (as shown in the testing section) or by a WSGI server to run your application.
+
 ## Flask: Testing
 
 Flask apps have a built-in Werkzeug test client which can be used within unit tests.
@@ -155,41 +189,43 @@ The below `pytest` example will...
 * return a test client to use within unit tests
 
 ```python
-# myproject/tests/conftest.py
+# my_project/tests/conftest.py
 import pytest
 
 from my_project.app import create_app
 from my_project.config import MyAppConfig
-from my_app.database import db as app_db
+from my_project.database import db as app_db
 
 
-@pytest.yield_fixture(scope="session")
+@pytest.fixture(scope="session")
 def app(request):
     flask_app = create_app(MyAppConfig())
-    ctx = flask_app.app_context()
-    ctx.push()
-
-    yield flask_app
-
-    ctx.pop()
+    with flask_app.app_context():
+        yield flask_app
 
 
 @pytest.fixture(scope="session")
 def db(app, request):
     app_db.drop_all()
     app_db.create_all()
-
-    app_db.app = app
     yield app_db
-
     app_db.drop_all()
 
 
-@pytest.yield_fixture(scope="function")
+@pytest.fixture(scope="function")
 def session(db, request):
-    db.session.begin_nested()
-    yield db.session
-    db.session.rollback()
+    connection = db.engine.connect()
+    transaction = connection.begin()
+
+    options = dict(bind=connection, binds={})
+    sess = db.create_scoped_session(options=options)
+
+    db.session = sess
+    yield sess
+
+    sess.remove()
+    transaction.rollback()
+    connection.close()
 
 
 @pytest.fixture(scope="function")
@@ -198,7 +234,7 @@ def client(app, session):
         yield c
 
 
-# myproject/tests/test_user_endpoint.py
+# my_project/tests/test_user_endpoint.py
 def test_users_get(client):
     response = client.get("/api/v1/users")
 
