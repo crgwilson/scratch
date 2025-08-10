@@ -4,6 +4,8 @@ OpenTelemetry is an open-source observability framework for collecting, processi
 
 ## Traces
 
+* [OpenTelemetry Collector](opentelemetry-collector.md)
+
 A trace is a representation of a single transaction or request as it flows through a distributed system. It is composed of one or more spans.
 
 ### Creating Custom Traces
