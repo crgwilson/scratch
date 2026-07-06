@@ -8,7 +8,7 @@ One location to house the contents of my brain.
 * [Design Patterns](Design-Patterns/README.md)
 * [GPG](Gpg/README.md)
 * [Java](Java/README.md)
-* [Kubernetes](Kubernetes/README.md)
+* [Kubernetes](kubernetes/README.md)
 * [Lua](Lua/README.md)
 * [Neovim](Neovim/README.md)
 * [Python](Python/README.md)

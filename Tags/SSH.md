@@ -1,0 +1,1 @@
+Secure shell protocol is the most common way to connect and remotely manage a Linux machine.
