@@ -1,0 +1,10 @@
+*
+!.gitignore
+!Makefile
+!pyproject.toml
+!src/
+!src/.gitkeep
+!src/sandbox.py
+!tests/
+!tests/.gitkeep
+!tests/test_example.py
