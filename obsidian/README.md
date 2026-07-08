@@ -4,5 +4,5 @@ Tips on how to use this app...
 
 ### Open fuzzy finder
 ```
-cmd+0
+cmd+o
 ```
