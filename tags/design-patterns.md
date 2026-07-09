@@ -28,4 +28,5 @@
 - [design-patterns/strategy](../design-patterns/strategy.md)
 - [design-patterns/template-method](../design-patterns/template-method.md)
 - [design-patterns/visitor](../design-patterns/visitor.md)
+- [python/iterators](../python/iterators.md)
 <!-- tagged-notes:end -->

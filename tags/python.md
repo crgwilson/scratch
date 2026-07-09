@@ -10,6 +10,7 @@
 - [python/dbus](../python/dbus.md)
 - [python/flask](../python/flask.md)
 - [python/functools](../python/functools.md)
+- [python/iterators](../python/iterators.md)
 - [python/pyproject.toml](../python/pyproject.toml.md)
 - [python/pytest](../python/pytest.md)
 - [python/re](../python/re.md)
