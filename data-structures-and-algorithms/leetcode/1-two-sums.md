@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - leetcode
+---
 ### Description
 Given an array of integers `nums` and an integer `target`, return _indices_ of the two numbers such that they add up to `target`.
 

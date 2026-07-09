@@ -1,3 +1,9 @@
+---
+tags:
+  - linux
+  - networking
+  - operating-systems
+---
 # What happens when you type google.com into your web browser
 
 ## 1. The "g" key is pressed

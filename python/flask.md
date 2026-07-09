@@ -1,3 +1,9 @@
+---
+tags:
+  - flask
+  - programming-language
+  - python
+---
 # Flask
 
 Quick & dirty collection of thoughts on using the Flask web framework for

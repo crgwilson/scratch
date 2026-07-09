@@ -1,3 +1,8 @@
+---
+tags:
+  - creational-patterns
+  - design-patterns
+---
 The Builder is one of the [[Creational-Patterns]] described in [[Design Patterns Elements of Reusable Object-Oriented Software]].
 
 Separate the construction of a complex object from its representation so that the same construction process can create different representations.

@@ -1,3 +1,8 @@
+---
+tags:
+  - programming-language
+  - python
+---
 # Python
 
 Notes on anything python related

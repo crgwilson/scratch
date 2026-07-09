@@ -1,3 +1,9 @@
+---
+tags:
+  - concurrency
+  - java
+  - programming-language
+---
 # Concurrency
 
 Java has the `Thread` class which you can use to write multi-threaded applications.

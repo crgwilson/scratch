@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Design the OpenAI Playground (mockup -> product)
 
 ## Prompt

@@ -1,3 +1,9 @@
+---
+tags:
+  - container-orchestration
+  - kubernetes
+  - storage
+---
 # Kubernetes: Storage
 
 Kubernetes provides a robust and flexible storage system that abstracts away the complexities of underlying storage infrastructure. This allows applications to consume storage resources without knowing the specifics of how that storage is provisioned. The key concepts are PersistentVolumes (PVs), PersistentVolumeClaims (PVCs), and StorageClasses.

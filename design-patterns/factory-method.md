@@ -1,3 +1,8 @@
+---
+tags:
+  - creational-patterns
+  - design-patterns
+---
 The Factory Method is one of the [[Creational-Patterns]] described in [[Design Patterns Elements of Reusable Object-Oriented Software]].
 
 Define an interface for creating an object, but let subclasses decide which class to instantiate. Factory Method lets a class defer instantiation to subclasses.

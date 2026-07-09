@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - practical-coding
+---
 # "Practical" Coding Practice Problems
 Practice coding problems for places which do not do traditional leetcode style coding interviews. Questions are intended to have you build small systems like you would see in real life.
 

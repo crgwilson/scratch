@@ -1,3 +1,8 @@
+---
+tags:
+  - editor
+  - neovim
+---
 # Neovim
 
 All my notes on Neovim (the best editor) mostly focused on writing plugins

@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # LRU Cache (warm-up classic, most-reported single question)
 ## Part A:
 ```python

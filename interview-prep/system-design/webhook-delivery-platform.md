@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Webhook Delivery Platform
 Target: core design complete by minute 35, two deep dives, then scaling pressure.
 ## Prompt

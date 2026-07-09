@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - pyproject.toml
+  - python
+---
 # pyproject.toml
 
 The `pyproject.toml` file is a configuration file for Python projects. It was introduced in [PEP 518](https://peps.python.org/pep-0518/) and is the new standard for configuring Python projects. It is a TOML file and can be used to configure various aspects of a Python project, including the build system, project metadata, and tool-specific configurations.

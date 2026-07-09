@@ -1,3 +1,9 @@
+---
+tags:
+  - gradle
+  - java
+  - programming-language
+---
 # Gradle
 
 Gradle is a build framework most commonly used for Java projects which can be configured using either a Groovy or Kotlin DSL

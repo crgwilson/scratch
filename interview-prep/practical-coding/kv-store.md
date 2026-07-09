@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Key-value store (three staged variants)
 ## 1. Time-based KV store
 ### Setup

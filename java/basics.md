@@ -1,3 +1,9 @@
+---
+tags:
+  - basics
+  - java
+  - programming-language
+---
 # The Basics
 
 Main methods are expected to have the signature

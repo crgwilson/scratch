@@ -1,3 +1,8 @@
+---
+tags:
+  - java
+  - programming-language
+---
 # Java
 
 Notes on anything java related

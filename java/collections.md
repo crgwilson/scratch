@@ -1,3 +1,9 @@
+---
+tags:
+  - collections
+  - java
+  - programming-language
+---
 # Collections
 
 Notes regarding the interfaces and classes available with java collections.

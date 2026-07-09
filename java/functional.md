@@ -1,3 +1,9 @@
+---
+tags:
+  - functional
+  - java
+  - programming-language
+---
 # Functional Programming in Java
 
 ## Functional Interfaces

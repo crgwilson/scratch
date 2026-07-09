@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Token Usage Monitoring / Metrics System
 
 ## Prompt

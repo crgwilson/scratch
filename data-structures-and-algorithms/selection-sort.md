@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - sorting-algorithm
+---
 [[Sorting-Algorithm]]
 ## Sources:
 

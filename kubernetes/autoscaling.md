@@ -1,3 +1,9 @@
+---
+tags:
+  - autoscaling
+  - container-orchestration
+  - kubernetes
+---
 # Kubernetes: Autoscaling
 
 Autoscaling in Kubernetes allows your applications and cluster to automatically adjust their size based on demand, ensuring optimal resource utilization and application performance. Kubernetes offers three main types of autoscaling: Horizontal Pod Autoscaling (HPA), Vertical Pod Autoscaling (VPA), and Cluster Autoscaling.

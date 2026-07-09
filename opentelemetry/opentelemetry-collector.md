@@ -1,3 +1,9 @@
+---
+tags:
+  - observability
+  - opentelemetry
+  - opentelemetry-collector
+---
 # OpenTelemetry Collector
 
 The OpenTelemetry Collector is a vendor-agnostic proxy that can receive, process, and export telemetry data. It is a key component of an OpenTelemetry-based observability solution, providing a flexible and scalable way to manage telemetry data between your applications and various backends.

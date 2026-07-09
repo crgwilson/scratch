@@ -1,3 +1,9 @@
+---
+tags:
+  - container-orchestration
+  - installation
+  - kubernetes
+---
 # Kubernetes: Installation
 
 ## Installation: Pre-reqs

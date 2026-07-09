@@ -1,3 +1,9 @@
+---
+tags:
+  - argparse
+  - programming-language
+  - python
+---
 # Argparse
 
 Write CLIs without having to install `click`

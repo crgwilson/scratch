@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Wildcards (one timed rep each if you have time)
 
 ## 8a. Version-support detective problem (hidden-requirements style)

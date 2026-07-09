@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structure
+  - data-structures-and-algorithms
+---
 Stacks are LIFO (last in, first out), [[Data-Structure]]s which let you push new elements onto the top, and pop elements off the top. Pushing and popping are again constant O(1).
 
 ```java

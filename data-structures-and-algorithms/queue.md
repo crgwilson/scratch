@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structure
+  - data-structures-and-algorithms
+---
 Queues are FIFO (first in, first out) [[Data-Structure]]s. You can insert new elements to the end of the queue, and pop off from the front. These can be implemented using a singly linked list.
 
 Pushing and popping from a queue are both constant time O(1). Typically you can also `peek`, which will look at the first element without popping.

@@ -1,3 +1,9 @@
+---
+tags:
+  - editor
+  - lua
+  - neovim
+---
 # Neovim Lua Plugins
 
 ## Project layout

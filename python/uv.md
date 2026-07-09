@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - uv
+---
 # uv
 
 uv is an extremely fast Python package installer, resolver, and manager, written in Rust. It is designed to be a drop-in replacement for `pip` and `pip-tools`.

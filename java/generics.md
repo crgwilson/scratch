@@ -1,3 +1,9 @@
+---
+tags:
+  - generics
+  - java
+  - programming-language
+---
 # Generics
 
 Generics let you write a method which can accept any type of object eliminating the need for

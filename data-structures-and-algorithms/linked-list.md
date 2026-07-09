@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structure
+  - data-structures-and-algorithms
+---
 Linked lists are [[Data-Structure]]s which come in two flavors.
 
 Singly linked - A collection of nodes linked to the one behind them

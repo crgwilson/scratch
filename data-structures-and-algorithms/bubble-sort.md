@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - sorting-algorithm
+---
 The simplest [[Sorting-Algorithm]], which sorts at **O(N^2)**.
 
 * Start in the 0th position and go to the end of the array

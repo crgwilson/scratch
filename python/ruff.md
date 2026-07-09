@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - ruff
+---
 # Ruff
 
 Ruff is an extremely fast Python linter and code formatter, written in Rust. It can be used to check your code for errors, enforce coding standards, and automatically format your code.

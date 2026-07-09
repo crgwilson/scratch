@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Rate Limiter as a Service
 
 ## Prompt

@@ -1,3 +1,9 @@
+---
+tags:
+  - collections
+  - programming-language
+  - python
+---
 # Collections
 
 Notes regarding python's `collections` module

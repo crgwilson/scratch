@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Web Crawler at Scale
 
 ## Prompt

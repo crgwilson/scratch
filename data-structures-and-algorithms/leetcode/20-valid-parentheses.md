@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - leetcode
+---
 ### Description
 Given a string `s` containing just the characters `(`, `)`, `{`, `}`, `[`, `]`, determine if the input string is valid.
 

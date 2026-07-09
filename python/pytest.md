@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - pytest
+  - python
+---
 # pytest
 
 Pytest is my preferred unit testing framework for python projects

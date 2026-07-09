@@ -1,3 +1,8 @@
+---
+tags:
+  - creational-patterns
+  - design-patterns
+---
 The Prototype is one of the [[Creational-Patterns]] described in [[Design Patterns Elements of Reusable Object-Oriented Software]].
 
 Ensure a class only has one instance, and provide a global point of access to it.

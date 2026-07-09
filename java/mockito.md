@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+  - mockito
+  - programming-language
+---
 # Mockito
 
 [Mockito](site.mockito.org) is the most popular Java mocking framework

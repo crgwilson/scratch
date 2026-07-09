@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # Design ChatGPT (product/full-stack emphasis)
 Target: core design complete by minute 35, two deep dives, then scaling pressure.
 ## Prompt

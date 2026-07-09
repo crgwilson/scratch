@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - recursion
+---
 What's always the problem with recursion? Recursion.
 
 Recursion is something which calls itself over and over. The danger with recursion is stack overflows, to get around this use a stack instead.

@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - sqlalchemy
+---
 # SQLAlchemy
 
 Notes regarding the `SQLAlchemy` python library

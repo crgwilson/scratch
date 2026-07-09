@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Spreadsheet with Formula Dependencies
 ## Setup
 Build the engine behind a spreadsheet. Cells are named like A1, B2. A cell holds either an integer or a formula that sums other cells.

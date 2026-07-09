@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - tox
+---
 # Tox
 
 Tox is a generic virtualenv management and test tool for Python projects.

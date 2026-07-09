@@ -1,0 +1,9 @@
+#!/bin/sh
+set -eu
+
+python3 scripts/update_tag_indexes.py
+
+if ! git diff --quiet -- tags; then
+    printf '%s\n' 'Tag indexes were updated. Review and stage the tag changes, then commit again.'
+    exit 1
+fi

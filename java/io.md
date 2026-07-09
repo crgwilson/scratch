@@ -1,3 +1,9 @@
+---
+tags:
+  - io
+  - java
+  - programming-language
+---
 # I/O
 
 Input / Output streams are used to read in and write out data to some IO (file, network socket, etc).

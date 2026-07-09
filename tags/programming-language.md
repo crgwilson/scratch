@@ -1,0 +1,37 @@
+# Programming Language
+
+<!-- tagged-notes:start -->
+## Tagged Notes
+
+- [go/README](../go/README.md)
+- [go/testing](../go/testing.md)
+- [java/README](../java/README.md)
+- [java/basics](../java/basics.md)
+- [java/collections](../java/collections.md)
+- [java/concurrency](../java/concurrency.md)
+- [java/functional](../java/functional.md)
+- [java/generics](../java/generics.md)
+- [java/gradle](../java/gradle.md)
+- [java/io](../java/io.md)
+- [java/junit](../java/junit.md)
+- [java/maven](../java/maven.md)
+- [java/memory](../java/memory.md)
+- [java/mockito](../java/mockito.md)
+- [java/testng](../java/testng.md)
+- [lua/README](../lua/README.md)
+- [python/README](../python/README.md)
+- [python/argparse](../python/argparse.md)
+- [python/asyncio](../python/asyncio.md)
+- [python/collections](../python/collections.md)
+- [python/dbus](../python/dbus.md)
+- [python/flask](../python/flask.md)
+- [python/functools](../python/functools.md)
+- [python/pyproject.toml](../python/pyproject.toml.md)
+- [python/pytest](../python/pytest.md)
+- [python/re](../python/re.md)
+- [python/ruff](../python/ruff.md)
+- [python/sqlalchemy](../python/sqlalchemy.md)
+- [python/tox](../python/tox.md)
+- [python/typing](../python/typing.md)
+- [python/uv](../python/uv.md)
+<!-- tagged-notes:end -->

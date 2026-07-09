@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - sorting-algorithm
+---
 Divide and conquer [[Sorting-Algorithm]].
 
 Split input into N chunks, and run through those smaller subsets to solve things faster **O(LogN)** optimistically. Pessimistically, (reverse sorted array), it will be O(N^2).

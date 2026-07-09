@@ -1,3 +1,8 @@
+---
+tags:
+  - design-patterns
+  - structural-patterns
+---
 The Composite is one of the [[Creational-Patterns]] described in [[Design Patterns Elements of Reusable Object-Oriented Software]].
 
 Compose objects into tree structures to represent part-whole hierarchies. Composite lets clients treat individual objects and compositions of objects uniformly.

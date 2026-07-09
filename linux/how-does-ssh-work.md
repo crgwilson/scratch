@@ -1,3 +1,10 @@
+---
+tags:
+  - linux
+  - networking
+  - operating-systems
+  - ssh
+---
 # How does SSH work
 
 ### [[SSH]] Version 2 Description

@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - re
+---
 # re
 
 Relearn how regexes work every time you try and use them

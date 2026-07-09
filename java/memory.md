@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+  - memory
+  - programming-language
+---
 # Memory Management
 
 The JVM is responsible for managing all java memory, including allocations, deallocations

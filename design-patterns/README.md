@@ -1,3 +1,8 @@
+---
+tags:
+  - design-patterns
+  - software-design
+---
 # Design Patterns
 
 ## Index

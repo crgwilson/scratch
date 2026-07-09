@@ -1,3 +1,9 @@
+---
+tags:
+  - go
+  - programming-language
+  - testing
+---
 # Testing
 
 Golang has pretty good built in support for unit testing within the `testing` package in the stdlib, although for easier assertions

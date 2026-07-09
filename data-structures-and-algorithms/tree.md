@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structure
+  - data-structures-and-algorithms
+---
 Trees are [[Data-Structure]]s which represent a type of hierarchy. Think filesystems, the DOM, and much more.
 
 ![](../Excalidraw/Tree.png)

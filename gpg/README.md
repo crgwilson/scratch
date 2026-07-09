@@ -1,3 +1,8 @@
+---
+tags:
+  - gpg
+  - security
+---
 # GPG
 
 ## Cheatsheet

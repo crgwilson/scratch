@@ -1,3 +1,8 @@
+---
+tags:
+  - lua
+  - programming-language
+---
 # lua
 
 ## OOP in Lua

@@ -1,3 +1,8 @@
+---
+tags:
+  - observability
+  - opentelemetry
+---
 # OpenTelemetry
 
 OpenTelemetry is an open-source observability framework for collecting, processing, and exporting telemetry data (traces, metrics, and logs). It provides a single set of APIs, libraries, agents, and collector services to capture distributed traces and metrics from your application.

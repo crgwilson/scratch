@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+  - maven
+  - programming-language
+---
 # Maven
 
 Maven cheatsheet

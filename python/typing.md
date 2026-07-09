@@ -1,3 +1,9 @@
+---
+tags:
+  - programming-language
+  - python
+  - typing
+---
 # Typing
 
 Notes regarding python type hints and how to validate them

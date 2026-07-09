@@ -1,3 +1,8 @@
+---
+tags:
+  - creational-patterns
+  - design-patterns
+---
 The Abstract Factory is one of the [[Creational-Patterns]] described in [[Design Patterns Elements of Reusable Object-Oriented Software]].
 
 Abstract factories allow you to create families of related or dependent objects without specifying their concrete classes.

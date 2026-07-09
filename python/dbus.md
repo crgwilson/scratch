@@ -1,3 +1,9 @@
+---
+tags:
+  - dbus
+  - programming-language
+  - python
+---
 # dbus-python
 
 [dbus-python][dbus-python] provides bindings to interact with dbus on linux systems.

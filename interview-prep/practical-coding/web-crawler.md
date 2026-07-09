@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Multithreaded Web Crawler
 
 ## Setup

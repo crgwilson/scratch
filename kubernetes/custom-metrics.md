@@ -1,3 +1,9 @@
+---
+tags:
+  - container-orchestration
+  - custom-metrics
+  - kubernetes
+---
 # Kubernetes: Custom Metrics for Autoscaling
 
 While the Horizontal Pod Autoscaler (HPA) can scale based on standard resource metrics like CPU and memory utilization, many applications require scaling based on more specific, application-level metrics. This is where **Custom Metrics** come into play.

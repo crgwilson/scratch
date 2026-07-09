@@ -1,3 +1,9 @@
+---
+tags:
+  - authentication-authorization
+  - container-orchestration
+  - kubernetes
+---
 # Kubernetes: Authentication and Authorization
 
 Kubernetes provides robust mechanisms for authenticating users and authorizing their actions within the cluster. This is primarily managed through a combination of authentication methods, Role-Based Access Control (RBAC), and Service Accounts.

@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Resumable Iterator
 ## Setup
 We work with very large datasets and long-running jobs that can be interrupted at any point. We want iterators whose position can be saved and restored, so a job can resume exactly where it left off. Here's an interface - do not change its signature:

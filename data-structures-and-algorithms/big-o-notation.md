@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithm-analysis
+  - algorithms
+  - data-structures-and-algorithms
+---
 ## Big O Time Complexity
 
 Big O categorizes your algorithm's time or memory requirements based on input. It is not meant to be an exact measurement. As your input grows how fast does your computation or memory grow?

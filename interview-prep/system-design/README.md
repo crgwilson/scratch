@@ -1,3 +1,8 @@
+---
+tags:
+  - interview-prep
+  - system-design
+---
 # System Design Practice Problems
 Practice system design problems to run through during a new interview prep cycle.
 ## How to run a solo mock with these

@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structures-and-algorithms
+  - sorting-algorithm
+---
 Merge sort is the best of [[Selection-Sort]], [[Insertion-Sort]], and [[Bubble-Sort]]. It is a divide and conquer [[Sorting-Algorithm]].
 ![[Merge-Sort.png]]
 1. Recursively sort 1st half of input array.

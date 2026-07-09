@@ -1,3 +1,9 @@
+---
+tags:
+  - application-deployment
+  - container-orchestration
+  - kubernetes
+---
 # Kubernetes: Application Deployment Concepts
 
 Deploying a multi-application system in Kubernetes involves understanding several core constructs that enable container orchestration, inter-service communication, and external accessibility. This document outlines the key components and patterns for such deployments.

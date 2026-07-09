@@ -1,3 +1,9 @@
+---
+tags:
+  - linux
+  - networking
+  - operating-systems
+---
 # What happens when you curl something
 
 Who knows dude...

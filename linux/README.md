@@ -1,3 +1,8 @@
+---
+tags:
+  - linux
+  - operating-systems
+---
 # Linux
 
 Notes about Penguins

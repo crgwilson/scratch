@@ -1,3 +1,5 @@
+# Algorithms Illuminated Omnibus Edition
+
 Algorithms illuminated is a book series and set of [online materials](https://algorithmsilluminated.org/) taught by [Tim Roughgarden](http://timroughgarden.org/).
 ![[omnibus.jpg]]
 

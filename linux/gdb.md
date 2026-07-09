@@ -1,3 +1,9 @@
+---
+tags:
+  - debugging
+  - linux
+  - operating-systems
+---
 # GDB
 
 ## Allow core dumps (CentOS)

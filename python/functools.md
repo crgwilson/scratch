@@ -1,3 +1,9 @@
+---
+tags:
+  - functools
+  - programming-language
+  - python
+---
 # functools
 
 The `functools` module provides a bunch of handy decorators for your functions

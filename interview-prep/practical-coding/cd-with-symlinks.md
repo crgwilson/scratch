@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # Unix `cd` with Symlinks
 ## Setup
 Implement the logic behind the shell's `cd` command. Given the current working directory (absolute) and a target path, return the resulting absolute path, like `cd <target> && pwd`.

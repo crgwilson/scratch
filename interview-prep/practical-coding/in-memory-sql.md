@@ -1,3 +1,9 @@
+---
+tags:
+  - coding-exercise
+  - interview-prep
+  - practical-coding
+---
 # In-Memory SQL-Like Database
 ## Setup
 Implement a simple in-memory database. No SQL parsing - just provide a programmatic API. One table is fine to start. All you need is what I ask for in each part; keep the API backward compatible as we extend it.

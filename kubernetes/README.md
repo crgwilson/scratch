@@ -1,3 +1,8 @@
+---
+tags:
+  - container-orchestration
+  - kubernetes
+---
 # Kubernetes
 
 Notes on anything k8s related

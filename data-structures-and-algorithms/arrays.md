@@ -1,3 +1,9 @@
+---
+tags:
+  - algorithms
+  - data-structure
+  - data-structures-and-algorithms
+---
 An array is a [[Data-Structure]] contiguous memory space which contains a certain amount of bytes.
 
 * Fixed size, cannot grow

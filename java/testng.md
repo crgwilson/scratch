@@ -1,3 +1,9 @@
+---
+tags:
+  - java
+  - programming-language
+  - testng
+---
 # TestNG
 
 TestNG is another unit testing framework for java which was inspired by JUnit, but has a few more features.
