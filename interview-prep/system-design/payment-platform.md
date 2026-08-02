@@ -483,3 +483,39 @@ CREATE TABLE network_messages (   -- every auth attempt, for the sweeper + dispu
 );
 CREATE INDEX ON network_messages (transaction_id, created_at);
 ```
+
+## TL;DR
+Architecture -
+* **Two systems, one mutable window** - Hot path (auth) = sync, availability + p99 latency, human waiting. Cold path (capture) = async batch, correctness + exactly-once, nobody waiting. Between them the amendment window, which is _why_ auth and capture are separate ops.
+* **Hot path:** POS (mTLS + client-generated idempotency UUID) → gateway → auth service → network gateway → scheme/issuer. Auth service is deliberately thin; risk checks in-process/Redis.
+* **Batches are DB rows that accumulate all day.** Transaction assigned to a batch at _auth_ time. `UNIQUE (merchant_id) WHERE state='OPEN'` enforces one open batch per merchant.
+* **Cutoff is a state transition, not a job:** `UPDATE batch SET state='SEALED' WHERE id=? AND state='OPEN'`. O(1), idempotent, instant. Everything heavy becomes resumable async work.
+* **State machine:** `PENDING_AUTH → AUTHORIZED → CAPTURE_QUEUED → SUBMITTED → SETTLED`, with `DECLINED / VOIDED / EXPIRED / REJECTED` off-ramps. **AUTHORIZED is the only mutable state.**
+* **Tips = append-only `adjustments` rows**, not `UPDATE amount`. Capture amount = `auth + SUM(adjustments)` while open, frozen to a snapshot column at seal so file rebuilds are byte-identical.
+* **Store:** sharded relational by `merchant_id` (Postgres/Aurora, or Cockroach/Spanner multi-region). Need multi-row atomicity; no eventual consistency near money.
+* **Two aggregation boundaries that cross:** batch = 1 merchant × 1 date × mixed brands. File = 1 destination × 1 cycle × 1000s of merchants. Destination = `(scheme, acquiring_bin)`.
+* **Pipeline changes key halfway:** seal + materialize keyed on `merchant_id` (single-shard) → **repartition** → assemble + transmit keyed on `destination_id` (cross-shard).
+* **File assembly = two-phase claim:** create file `BUILDING` → `UPDATE clearing_records SET file_id=? WHERE destination_id=? AND file_id IS NULL` in chunks → flip to `BUILT`. Resumable; `IS NULL` predicate prevents double-claim.
+* **Ledger is separate and append-only double-entry.** Not an event log. **A hold posts nothing; a tip posts nothing** - nothing has moved. Postings start at capture. Exposure goes in memo accounts.
+* **Reconciliation:** ingest next-day response files, match submissions, emit break report + continuous ledger invariant check. It's the only thing that tells you the rest works.
+* **Idempotency has two layers:** client-generated random UUID at the POS boundary (only the caller knows "same intent"); server-derived `{entity}:{op}[:{seq}]` internally. Store the response, not just the key; hash the request body to catch key reuse with different params.
+
+Trade-offs to remember -
+* **Batch assigned at auth, not at cutoff** - small extra write; buys O(1) sealing and kills the 21:59:59 race.
+- **Tips as events, not mutations** - extra storage + `SUM` on read; buys audit trail, idempotency, concurrency safety.
+- **Sharded SQL over KV** - harder write scaling; buys multi-row atomicity. 20M txn/day is a few GB - this is _not_ a big-data problem.
+- **Shard by merchant** - makes seal/materialize single-shard, makes file assembly a cross-shard shuffle. Name this weakness yourself before they do.
+- **Kafka as event backbone + the repartition, not as a work queue.** The destination shuffle is the strongest use. For distributing 100k batches, `FOR UPDATE SKIP LOCKED` or Temporal is simpler with better per-item visibility. At this volume, outbox + SNS/SQS would also do - Kafka is justified by consumer count and replay, not throughput.
+- **Ledger in OLTP, not a lake.** Kafka→Iceberg→Trino can _detect_ imbalance, never _prevent_ it. Lake is a mirror (close, analytics, 7-yr retention), never the master.
+- **Hard-reject tips after seal** - worse UX for forgetful servers; prevents double-charging a customer. Never unseal a batch. Grace period (seal 22:00, submit 22:15) covers most cases; past that, tip-only txn next day.
+- **Tip past tolerance:** incremental auth (correct, adds a sync network call) → fallback to re-running the card. Tolerance is per-MCC config, never a constant.
+- **Balances:** `SUM(postings)` is correct but slows down. Adding an `account_balances` row in the same txn buys O(1) reads at the cost of contention on hot house accounts like `fee_revenue` - shard those into buckets.
+- **Bank down at 10pm is fine** (auths valid for days, huge slack); 30s down on the auth path is a store outage. Same company, opposite urgency.
+- **Whole-file reject ≠ per-record reject.** Distinct code paths - conflating them means re-sending a good file or silently dropping 40k transactions.
+- **Batch state is a rollup, not a state.** One batch's records span 3 files with 3 cycles; Visa can ack while Amex rejects. The dashboard must show partial settlement honestly.
+
+Something that always confuses you -
+* **Schema** - You're using a few SQL tables.
+	* The `transactions` table contains the transaction uuid (idempotency). `merchant_id` + `uuid` must be unique. This table is for your state transitions and is mutable.
+	* The `adjustments` table is for your amounts on your transactions, it is immutable and append-only. Each adjustment gets its own UUID as well, and for uniqueness `transaction_id` + `uuid` must be unique.
+	* We can have a third `file_submissions` table to track the files we submit. It again will have its own uuid, a `sent_at`timestamp to track attempts, transport status (did it succeed?), file SHA (for integrity), and a `file_uri` pointing to the generated file in a blob store somewhere. The bytes of the file itself do not belong in a database!
