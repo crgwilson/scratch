@@ -21,3 +21,7 @@ An endpoint is down for 6 hours -
 Now 100x event volume -
 * What breaks first?
 * How do you stop a malicious/broken endpoint from consuming all delivery capacity?
+
+
+
+
