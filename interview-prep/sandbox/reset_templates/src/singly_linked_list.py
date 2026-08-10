@@ -10,14 +10,12 @@
 # Keep append_tail O(n) unless you decide to add a tail pointer as a follow-up.
 class Node:
     def __init__(self, value: int) -> None:
-        self.value = value
-        self.next: Node | None = None
+        raise NotImplementedError
 
 
 class SinglyLinkedList:
     def __init__(self) -> None:
-        self.head: Node | None = None
-        self._length = 0
+        raise NotImplementedError
 
     def __len__(self) -> int:
         raise NotImplementedError

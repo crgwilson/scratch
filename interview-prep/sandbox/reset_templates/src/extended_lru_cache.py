@@ -13,7 +13,7 @@
 # * add stats() for hit rate.
 class LRUCache:
     def __init__(self, capacity: int) -> None:
-        self.capacity = capacity
+        raise NotImplementedError
 
     def get(self, key: str) -> str | None:
         raise NotImplementedError

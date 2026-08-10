@@ -10,7 +10,7 @@
 # * make iteration lazy and memory-flat for a /8.
 class CIDRIterator:
     def __init__(self, cidr: str) -> None:
-        self.cidr = cidr
+        raise NotImplementedError
 
     def __iter__(self):
         raise NotImplementedError
@@ -18,7 +18,7 @@ class CIDRIterator:
 
 class MultiCIDRIterator:
     def __init__(self, cidrs: list[str]) -> None:
-        self.cidrs = cidrs
+        raise NotImplementedError
 
     def __iter__(self):
         raise NotImplementedError

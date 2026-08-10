@@ -15,7 +15,7 @@
 # * make resume work when the underlying source has shrunk since the checkpoint.
 class ResumableIterator:
     def __init__(self, source) -> None:
-        self.source = source
+        raise NotImplementedError
 
     def __iter__(self):
         return self

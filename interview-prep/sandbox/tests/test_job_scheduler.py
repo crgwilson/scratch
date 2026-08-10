@@ -42,3 +42,13 @@ def test_independent_jobs_are_included_once() -> None:
 #
 # def test_permanently_failed_job_skips_dependents() -> None:
 #     ...
+#
+#
+# Part 5 - debugging and hardening
+#
+# def test_scheduler_never_leaves_job_in_multiple_terminal_states() -> None:
+#     ...
+#
+#
+# def test_scheduler_records_retry_count_and_latency_metrics() -> None:
+#     ...

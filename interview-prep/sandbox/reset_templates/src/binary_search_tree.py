@@ -9,14 +9,12 @@
 # * ignore duplicate inserts
 class Node:
     def __init__(self, value: int) -> None:
-        self.value = value
-        self.left: Node | None = None
-        self.right: Node | None = None
+        raise NotImplementedError
 
 
 class BinarySearchTree:
     def __init__(self) -> None:
-        self.root: Node | None = None
+        raise NotImplementedError
 
     def insert(self, value: int) -> None:
         raise NotImplementedError

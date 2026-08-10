@@ -14,7 +14,7 @@
 # * add delete operations that interact correctly with historical reads.
 class TimeBasedKeyValueStore:
     def __init__(self) -> None:
-        self.store: dict[str, list[tuple[int, str]]] = {}
+        raise NotImplementedError
 
     def set(self, key: str, value: str, timestamp: int) -> None:
         raise NotImplementedError

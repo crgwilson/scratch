@@ -12,6 +12,12 @@
 # Part 4:
 # * add aggregates (COUNT, SUM) with GROUP BY.
 #
+# Part 5:
+# * add INNER JOIN support across two in-memory tables.
+#
+# Part 6:
+# * add a simple window function, such as ROW_NUMBER() OVER (PARTITION BY ... ORDER BY ...).
+#
 # This problem rewards structure. Keep tokenizer, parser, and executor separate.
 class Tokenizer:
     def tokenize(self, query: str) -> list[str]:

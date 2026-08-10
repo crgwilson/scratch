@@ -39,3 +39,22 @@ def test_sync_overwrites_existing_remote_values() -> None:
 #
 # def test_conflicting_client_write_is_detected() -> None:
 #     ...
+#
+#
+# Part 5 - persistent key-value store
+#
+# def test_persistent_store_recovers_after_reopen(tmp_path) -> None:
+#     path = tmp_path / "store.log"
+#     store = PersistentKeyValueStore(str(path))
+#     store.put("a", "alpha")
+#     store.close()
+#
+#     reopened = PersistentKeyValueStore(str(path))
+#
+#     assert reopened.get("a") == "alpha"
+#
+#
+# Part 6 - partial log record recovery
+#
+# def test_recovery_ignores_partial_trailing_record(tmp_path) -> None:
+#     ...

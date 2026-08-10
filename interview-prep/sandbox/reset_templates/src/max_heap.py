@@ -8,7 +8,7 @@
 # * return None from peek/pop on an empty heap
 class MaxHeap:
     def __init__(self, values: list[int] | None = None) -> None:
-        self.heap: list[int] = []
+        raise NotImplementedError
 
     def __len__(self) -> int:
         raise NotImplementedError

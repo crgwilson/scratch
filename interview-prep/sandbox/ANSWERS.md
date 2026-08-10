@@ -182,6 +182,9 @@ class FixedWindowRateLimiter:
             return False
         self.counts[key] = (current_window, count + 1)
         return True
+
+    def reset(self, key):
+        self.counts.pop(key, None)
 ```
 
 Tradeoff: simple and memory efficient, but allows boundary bursts. A user can send `limit` requests at the end of one window and `limit` more at the start of the next.
@@ -252,6 +255,40 @@ class CompositeLimiter:
 ```
 
 In an interview, mention the mutation issue. The simple code may consume one limiter before another rejects.
+
+### Part 5 - distributed limiter, reset, fallback, and replay
+
+Reported OpenAI variants often push rate limiting into distributed state. The normal answer is Redis because it gives shared state across stateless application servers and atomic operations.
+
+For a sliding-window log, Redis sorted sets are a clean fit:
+- key: rate-limit key, such as user ID or API key
+- score: request timestamp in milliseconds
+- member: unique request ID
+- operation: remove old scores, count current scores, add current request if below limit, set TTL
+
+Use a Lua script or Redis transaction so count and add are atomic.
+
+```python
+def allow_distributed(redis, key, now_ms, limit, window_ms, request_id):
+    redis.zremrangebyscore(key, 0, now_ms - window_ms)
+    count = redis.zcard(key)
+    if count >= limit:
+        return False
+    redis.zadd(key, {request_id: now_ms})
+    redis.expire(key, int(window_ms / 1000) + 1)
+    return True
+```
+
+Clock skew: prefer server-side Redis time or a single trusted time source. If each app server passes its own clock, skew can incorrectly allow or reject requests.
+
+`reset(key)` should delete the limiter state for that key.
+
+Redis outage fallback: decide fail-open vs fail-closed. A practical degraded mode is local in-process or local-file limiting with an async replay queue. This is approximate because each server only sees local traffic during the outage.
+
+Tradeoffs:
+- fail-open protects availability but can exceed quota
+- fail-closed protects quota but can cause user-visible outages
+- local fallback is best-effort and needs observability so operators know accuracy is degraded
 
 ## P4 - LRU Cache, Then Extended
 
@@ -436,7 +473,56 @@ for key, group_rows in groups.items():
 
 Tradeoff: hardcoding aggregate output names is fine for a drill, but a cleaner parser should preserve aliases or derive names consistently.
 
-## P6 - Sync Local State to Cloud
+### Part 5 - INNER JOIN
+
+For a two-table inner join, parse table names, aliases if supported, and the equality join condition. The executor can use a nested loop first, then optimize with a hash join.
+
+Nested loop is simplest:
+
+```python
+joined = []
+for left in users:
+    for right in orders:
+        if left["id"] == right["user_id"]:
+            joined.append({"users": left, "orders": right})
+```
+
+Hash join is better when one side can be indexed:
+
+```python
+index = {}
+for order in orders:
+    index.setdefault(order["user_id"], []).append(order)
+
+joined = []
+for user in users:
+    for order in index.get(user["id"], []):
+        joined.append((user, order))
+```
+
+Tradeoff: prefix columns internally, such as `users.name`, so duplicate column names do not collide.
+
+### Part 6 - window functions
+
+A simple `ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total)` can be implemented by grouping rows by partition key, sorting each group, then assigning numbers.
+
+```python
+groups = defaultdict(list)
+for row in rows:
+    groups[row[partition_by]].append(row)
+
+output = []
+for _, group in groups.items():
+    group.sort(key=lambda row: row[order_by])
+    for index, row in enumerate(group, start=1):
+        new_row = dict(row)
+        new_row["row_number"] = index
+        output.append(new_row)
+```
+
+Keep this deliberately narrow. A full SQL window engine is much larger than the interview prompt usually needs.
+
+## P6 - Sync Local State to Cloud / Persistent Key-Value Store
 
 ### Part 1 - upload all keys
 
@@ -491,7 +577,53 @@ remote.put(key, value_bytes, expected_version=known_version)
 
 Explain conflict policy: last-write-wins is simple but can lose data. Compare-and-swap with explicit conflict handling is safer.
 
+### Part 5 - append-only persistence
+
+Reported variants often ask for a persistent key-value store rather than cloud sync specifically. The clean interview design is an in-memory dict plus append-only log.
+
+Each mutation writes a record:
+
+```text
+PUT key value
+DEL key
+```
+
+On startup, replay the log from the beginning to rebuild the dict.
+
+```python
+def put(self, key, value):
+    self.data[key] = value
+    self.log.write(encode_record("PUT", key, value))
+    self.log.flush()
+
+def delete(self, key):
+    self.data.pop(key, None)
+    self.log.write(encode_record("DEL", key))
+    self.log.flush()
+```
+
+Tradeoffs:
+- append-only logs make writes simple and recovery straightforward
+- the file grows forever unless you add snapshots or compaction
+- flushing every write is safer but slower
+
+### Part 6 - partial write recovery
+
+Use length-prefixed records or checksums. During recovery, stop at the first incomplete or corrupt trailing record.
+
+```python
+def recover(path):
+    data = {}
+    for record in read_valid_records_until_corruption(path):
+        apply_record(data, record)
+    return data
+```
+
+This handles process crashes during a write. In a real system, write to a temp file and atomic rename for snapshots.
+
 ## P7 - Job Scheduler With Dependencies
+
+Reported variants can be from-scratch DAG scheduling or debugging existing concurrent scheduler code. Treat both as testing the same core ideas: state transitions, dependency invariants, retries, and no hanging dependents.
 
 ### Part 1 - run jobs respecting a DAG
 
@@ -554,6 +686,25 @@ else:
 ```
 
 Important interviewer point: dependents must not hang waiting for a dependency that will never succeed.
+
+### Part 5 - debugging and hardening an existing scheduler
+
+If handed existing code, start by identifying invariants:
+- a job is in exactly one state set
+- a terminal job never moves back to running
+- retry count increments once per failed attempt
+- no more than N jobs run at once
+- no more than R jobs start per second if a start-rate limit exists
+- dependents of permanent failures are skipped or marked blocked
+
+Useful fixes:
+- protect multi-step state transitions with a lock
+- use a queue for ready jobs
+- separate worker concurrency from start-rate limiting
+- record start time, finish time, latency, retry count, and final status
+- make job execution idempotent or document at-least-once semantics
+
+Tests should reproduce the original bug. For example, if a race puts a job in both `completed` and `failed`, write a test that forces two workers through that path before refactoring.
 
 ## P8 - IP Address Iterator
 

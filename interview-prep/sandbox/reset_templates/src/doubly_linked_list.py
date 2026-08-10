@@ -9,16 +9,12 @@
 # * handle empty lists and invalid indexes cleanly
 class Node:
     def __init__(self, value: int) -> None:
-        self.value = value
-        self.prev: Node | None = None
-        self.next: Node | None = None
+        raise NotImplementedError
 
 
 class DoublyLinkedList:
     def __init__(self) -> None:
-        self.head: Node | None = None
-        self.tail: Node | None = None
-        self._length = 0
+        raise NotImplementedError
 
     def __len__(self) -> int:
         raise NotImplementedError

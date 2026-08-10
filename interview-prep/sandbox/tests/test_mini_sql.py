@@ -57,3 +57,29 @@ def test_where_can_compare_numbers() -> None:
 #         {"user_id": 1, "count": 2, "sum_total": 75},
 #         {"user_id": 2, "count": 1, "sum_total": 25},
 #     ]
+#
+#
+# Part 5 - JOIN
+#
+# def test_inner_join() -> None:
+#     rows = execute(
+#         "SELECT users.name, orders.total FROM users JOIN orders ON users.id = orders.user_id",
+#         tables,
+#     )
+#
+#     assert rows == [
+#         {"name": "Ada", "total": 50},
+#         {"name": "Ada", "total": 25},
+#         {"name": "Grace", "total": 10},
+#     ]
+#
+#
+# Part 6 - window functions
+#
+# def test_row_number_partitioned_by_user() -> None:
+#     rows = execute(
+#         "SELECT user_id, total, ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY total) FROM orders",
+#         tables,
+#     )
+#
+#     assert rows[0]["row_number"] == 1
