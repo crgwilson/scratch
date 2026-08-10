@@ -1,0 +1,670 @@
+# Practice Problem Answers
+
+This guide is meant as a study aid, not as the first thing to read before doing a rep. Use it when you get stuck, then reset the source and try again from memory.
+
+## P1 - Time-based Key/Value Store
+
+### Part 1 - set and get at timestamp
+
+Store each key as a sorted list of `(timestamp, value)` pairs. `set` appends if timestamps arrive in increasing order, otherwise insert while preserving sort order. `get` uses binary search to find the rightmost timestamp less than or equal to the query timestamp.
+
+Tradeoffs:
+- A list plus binary search gives `O(log n)` reads and `O(1)` appends for ordered writes.
+- Out-of-order writes cost `O(n)` because insertion shifts list elements.
+- A balanced tree would improve arbitrary inserts, but is usually overkill in Python interviews unless the prompt stresses out-of-order writes.
+
+```python
+from bisect import bisect_right
+
+
+class TimeBasedKeyValueStore:
+    def __init__(self):
+        self.store = {}
+
+    def set(self, key, value, timestamp):
+        entries = self.store.setdefault(key, [])
+        if not entries or entries[-1][0] <= timestamp:
+            entries.append((timestamp, value))
+            return
+
+        index = bisect_right([ts for ts, _ in entries], timestamp)
+        entries.insert(index, (timestamp, value))
+
+    def get(self, key, timestamp):
+        entries = self.store.get(key, [])
+        timestamps = [ts for ts, _ in entries]
+        index = bisect_right(timestamps, timestamp) - 1
+        if index < 0:
+            return None
+        return entries[index][1]
+```
+
+### Part 2 - get_range
+
+Use two binary searches: left boundary at `t_start`, right boundary after `t_end`.
+
+```python
+def get_range(self, key, t_start, t_end):
+    entries = self.store.get(key, [])
+    timestamps = [ts for ts, _ in entries]
+    left = bisect_left(timestamps, t_start)
+    right = bisect_right(timestamps, t_end)
+    return [value for _, value in entries[left:right]]
+```
+
+### Part 3 - TTL expiry
+
+Store expiry metadata with each value, such as `(timestamp, value, expires_at)`. A read finds the latest candidate at or before the query timestamp, then checks whether `timestamp < expires_at`.
+
+Tradeoff: if the latest value is expired, decide whether to return an older unexpired value or `None`. Most systems treat a newer expired write as no longer visible and do not fall back to older values. State this assumption.
+
+```python
+def set(self, key, value, timestamp, ttl=None):
+    expires_at = None if ttl is None else timestamp + ttl
+    self.store.setdefault(key, []).append((timestamp, value, expires_at))
+
+def get(self, key, timestamp):
+    entry = self._latest_entry_at_or_before(key, timestamp)
+    if entry is None:
+        return None
+    _, value, expires_at = entry
+    if expires_at is not None and timestamp >= expires_at:
+        return None
+    return value
+```
+
+### Part 4 - delete and historical reads
+
+Represent deletes as tombstones in the same timeline. This makes delete history explicit and keeps binary search logic simple.
+
+```python
+def delete(self, key, timestamp):
+    self.store.setdefault(key, []).append((timestamp, None, None, True))
+
+def get(self, key, timestamp):
+    entry = self._latest_entry_at_or_before(key, timestamp)
+    if entry is None:
+        return None
+    _, value, expires_at, deleted = entry
+    if deleted:
+        return None
+    if expires_at is not None and timestamp >= expires_at:
+        return None
+    return value
+```
+
+Historical reads before the delete still see old values. Reads at or after the delete return `None` until another `set` happens.
+
+## P2 - Resumable Iterator
+
+### Part 1 - batch source to item iterator
+
+Maintain a batch iterator plus an in-memory current batch and index. When the current batch is exhausted, load the next non-empty batch.
+
+```python
+class ResumableIterator:
+    def __init__(self, source):
+        self.source = source
+        self.batch_iter = iter(source.batches_from(0))
+        self.current_batch = []
+        self.index_in_batch = 0
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        while self.index_in_batch >= len(self.current_batch):
+            self.current_batch = next(self.batch_iter)
+            self.index_in_batch = 0
+        item = self.current_batch[self.index_in_batch]
+        self.index_in_batch += 1
+        return item
+```
+
+### Part 2 - checkpoint and resume
+
+The opaque token should encode position, not implementation objects. For example, JSON with `batch_index` and `index_in_batch`, base64-encoded if you want opacity.
+
+```python
+import json
+
+def checkpoint(self):
+    return json.dumps({
+        "batch_index": self.batch_index,
+        "index_in_batch": self.index_in_batch,
+    })
+
+@classmethod
+def resume(cls, source, token):
+    state = json.loads(token)
+    iterator = cls(source)
+    iterator.batch_index = state["batch_index"]
+    iterator.index_in_batch = state["index_in_batch"]
+    iterator.batch_iter = iter(source.batches_from(iterator.batch_index))
+    iterator.current_batch = next(iterator.batch_iter, [])
+    return iterator
+```
+
+### Part 3 - source throws mid-batch
+
+Advance checkpoints only after an item is yielded successfully. If a batch fetch throws, keep the last committed position unchanged so retrying resumes from the last known safe point.
+
+Tradeoff:
+- At-least-once iteration can duplicate on retry if checkpointing is loose.
+- Exactly-once requires durable position updates after every item or idempotent downstream handling.
+
+### Part 4 - source shrank after checkpoint
+
+If the saved batch or item index is now past the end, stop cleanly instead of raising an unrelated index error. In an interview, explain whether your token is offset-based or stable-id-based.
+
+Stable IDs are better when data can shrink or reorder. Offsets are simpler but fragile if the underlying dataset mutates.
+
+## P3 - Rate Limiter
+
+### Part 1 - fixed-window counter per user
+
+Bucket requests by `timestamp // window_seconds`. Store a `(window_id, count)` per key.
+
+```python
+class FixedWindowRateLimiter:
+    def __init__(self, limit, window_seconds):
+        self.limit = limit
+        self.window_seconds = window_seconds
+        self.counts = {}
+
+    def allow(self, key, timestamp):
+        window = int(timestamp // self.window_seconds)
+        current_window, count = self.counts.get(key, (window, 0))
+        if current_window != window:
+            current_window, count = window, 0
+        if count >= self.limit:
+            self.counts[key] = (current_window, count)
+            return False
+        self.counts[key] = (current_window, count + 1)
+        return True
+```
+
+Tradeoff: simple and memory efficient, but allows boundary bursts. A user can send `limit` requests at the end of one window and `limit` more at the start of the next.
+
+### Part 2 - sliding window log
+
+Store recent request timestamps per key. Drop timestamps outside the window, then allow only if the remaining count is below the limit.
+
+```python
+from collections import defaultdict, deque
+
+class SlidingWindowLogRateLimiter:
+    def __init__(self, limit, window_seconds):
+        self.limit = limit
+        self.window_seconds = window_seconds
+        self.logs = defaultdict(deque)
+
+    def allow(self, key, timestamp):
+        log = self.logs[key]
+        cutoff = timestamp - self.window_seconds
+        while log and log[0] <= cutoff:
+            log.popleft()
+        if len(log) >= self.limit:
+            return False
+        log.append(timestamp)
+        return True
+```
+
+Tradeoff: precise but memory grows with request volume.
+
+### Part 3 - token bucket
+
+Each key has tokens and last refill time. Refill based on elapsed time, capped by capacity.
+
+```python
+class TokenBucketRateLimiter:
+    def __init__(self, capacity, refill_rate_per_second):
+        self.capacity = capacity
+        self.refill_rate = refill_rate_per_second
+        self.buckets = {}
+
+    def allow(self, key, timestamp):
+        tokens, last_seen = self.buckets.get(key, (self.capacity, timestamp))
+        tokens = min(self.capacity, tokens + (timestamp - last_seen) * self.refill_rate)
+        if tokens < 1:
+            self.buckets[key] = (tokens, timestamp)
+            return False
+        self.buckets[key] = (tokens - 1, timestamp)
+        return True
+```
+
+Behavior difference:
+- Fixed window is cheapest but bursty at boundaries.
+- Sliding log is precise over the last N seconds.
+- Token bucket smooths average rate while allowing stored burst capacity.
+
+### Part 4 - multiple limits
+
+Compose limiters. A request is allowed only if all limits allow. For production correctness, check all limits before mutating any counters, or support rollback.
+
+```python
+class CompositeLimiter:
+    def __init__(self, limiters):
+        self.limiters = limiters
+
+    def allow(self, key, timestamp):
+        return all(limiter.allow(key, timestamp) for limiter in self.limiters)
+```
+
+In an interview, mention the mutation issue. The simple code may consume one limiter before another rejects.
+
+## P4 - LRU Cache, Then Extended
+
+### Part 1 - get/put with capacity eviction
+
+Use a dict for key to node lookup and a doubly linked list for recency. Head is least recent, tail is most recent. Sentinel nodes simplify edge cases.
+
+```python
+class Node:
+    def __init__(self, key, value):
+        self.key = key
+        self.value = value
+        self.prev = None
+        self.next = None
+
+class LRUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.lookup = {}
+        self.head = Node(None, None)
+        self.tail = Node(None, None)
+        self.head.next = self.tail
+        self.tail.prev = self.head
+
+    def get(self, key):
+        node = self.lookup.get(key)
+        if node is None:
+            return None
+        self._move_to_tail(node)
+        return node.value
+
+    def put(self, key, value):
+        if key in self.lookup:
+            node = self.lookup[key]
+            node.value = value
+            self._move_to_tail(node)
+            return
+        if len(self.lookup) == self.capacity:
+            self._evict_head()
+        node = Node(key, value)
+        self.lookup[key] = node
+        self._append(node)
+```
+
+### Part 2 - per-entry TTL
+
+Add `expires_at` to the node. On `get`, treat expired entries as missing and remove them. On `put`, store the expiration.
+
+Tradeoff: lazy cleanup is simple. Eager cleanup requires a min-heap or background process keyed by expiry.
+
+### Part 3 - LFU eviction
+
+Use frequency buckets. Map key to node, and map frequency to an ordered dict of keys. Track `min_freq` for eviction.
+
+Tie-break rule: evict the least recently used key among the lowest-frequency keys. This is easy to explain and common.
+
+```python
+from collections import defaultdict, OrderedDict
+
+class LFUCache:
+    def __init__(self, capacity):
+        self.capacity = capacity
+        self.values = {}
+        self.freq = {}
+        self.buckets = defaultdict(OrderedDict)
+        self.min_freq = 0
+```
+
+On access, remove the key from its old frequency bucket, increment its frequency, and append it to the new bucket.
+
+### Part 4 - stats
+
+Track `hits` and `misses` in `get`.
+
+```python
+def stats(self):
+    total = self.hits + self.misses
+    return {
+        "hits": self.hits,
+        "misses": self.misses,
+        "hit_rate": 0 if total == 0 else self.hits / total,
+    }
+```
+
+Decide whether expired entries count as misses. Usually they should.
+
+## P5 - Mini SQL / Expression Evaluator
+
+### Part 1 - SELECT columns FROM table WHERE col = value
+
+Keep structure separate:
+- Tokenizer turns a string into tokens.
+- Parser turns tokens into an AST or query object.
+- Executor applies the parsed query to tables.
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Query:
+    columns: list[str]
+    table: str
+    where_column: str
+    where_value: object
+```
+
+Execution is filtering then projection.
+
+```python
+def execute(query, tables):
+    parsed = Parser().parse(query)
+    rows = tables[parsed.table]
+    filtered = [row for row in rows if row.get(parsed.where_column) == parsed.where_value]
+    return [{col: row.get(col) for col in parsed.columns} for row in filtered]
+```
+
+Tradeoff: do not try to support SQL generally. Define the grammar you support and reject everything else.
+
+### Part 2 - AND/OR
+
+Represent WHERE as an expression tree.
+
+```python
+@dataclass
+class Eq:
+    column: str
+    value: object
+
+@dataclass
+class And:
+    left: object
+    right: object
+
+@dataclass
+class Or:
+    left: object
+    right: object
+
+def eval_expr(expr, row):
+    if isinstance(expr, Eq):
+        return row.get(expr.column) == expr.value
+    if isinstance(expr, And):
+        return eval_expr(expr.left, row) and eval_expr(expr.right, row)
+    if isinstance(expr, Or):
+        return eval_expr(expr.left, row) or eval_expr(expr.right, row)
+```
+
+Mention precedence. Usually `AND` binds tighter than `OR`.
+
+### Part 3 - ORDER BY and LIMIT
+
+Apply order after filtering and before limit. Projection can happen before or after ordering only if the ORDER BY column is still available.
+
+```python
+rows = [row for row in rows if eval_expr(parsed.where, row)]
+if parsed.order_by:
+    rows.sort(key=lambda row: row.get(parsed.order_by))
+if parsed.limit is not None:
+    rows = rows[:parsed.limit]
+return [project(row, parsed.columns) for row in rows]
+```
+
+### Part 4 - aggregates and GROUP BY
+
+Group rows by the group-by column, then compute aggregate functions per group.
+
+```python
+from collections import defaultdict
+
+groups = defaultdict(list)
+for row in rows:
+    groups[row[group_by]].append(row)
+
+result = []
+for key, group_rows in groups.items():
+    result.append({
+        group_by: key,
+        "count": len(group_rows),
+        "sum_total": sum(row["total"] for row in group_rows),
+    })
+```
+
+Tradeoff: hardcoding aggregate output names is fine for a drill, but a cleaner parser should preserve aliases or derive names consistently.
+
+## P6 - Sync Local State to Cloud
+
+### Part 1 - upload all keys
+
+Convert strings to bytes and call remote `put` for each key.
+
+```python
+def sync(local, remote):
+    for key, value in local.items():
+        remote.put(key, string_to_bytes(value))
+```
+
+### Part 2 - only changed keys
+
+Keep a local manifest of key to checksum or version. Upload only when the checksum differs from the last synced checksum.
+
+```python
+import hashlib
+
+def checksum(value):
+    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+```
+
+Tradeoff: comparing content costs CPU but avoids unnecessary network writes. Comparing modified timestamps is cheaper but less reliable.
+
+### Part 3 - partial upload failure
+
+Update the manifest only after a key uploads successfully. Return or raise a useful error containing failed keys. Retrying should be safe because already uploaded unchanged keys can be skipped.
+
+```python
+def sync(local, remote, manifest):
+    failed = []
+    for key, value in local.items():
+        digest = checksum(value)
+        if manifest.get(key) == digest:
+            continue
+        try:
+            remote.put(key, string_to_bytes(value))
+            manifest[key] = digest
+        except Exception:
+            failed.append(key)
+    if failed:
+        raise SyncError(failed)
+```
+
+### Part 4 - two clients writing concurrently
+
+Use optimistic concurrency. Remote `put` should take an expected version or etag. If the etag changed, fail with conflict and force caller to merge or retry.
+
+```python
+remote.put(key, value_bytes, expected_version=known_version)
+```
+
+Explain conflict policy: last-write-wins is simple but can lose data. Compare-and-swap with explicit conflict handling is safer.
+
+## P7 - Job Scheduler With Dependencies
+
+### Part 1 - run jobs respecting a DAG
+
+Topological sort. Build adjacency list and indegree counts. Start with jobs that have zero indegree.
+
+```python
+from collections import defaultdict, deque
+
+def run_order(jobs):
+    graph = defaultdict(list)
+    indegree = {job.job_id: 0 for job in jobs}
+    for job in jobs:
+        for dep in job.dependencies:
+            graph[dep].append(job.job_id)
+            indegree[job.job_id] += 1
+
+    ready = deque([job_id for job_id, count in indegree.items() if count == 0])
+    order = []
+    while ready:
+        job_id = ready.popleft()
+        order.append(job_id)
+        for child in graph[job_id]:
+            indegree[child] -= 1
+            if indegree[child] == 0:
+                ready.append(child)
+    return order
+```
+
+### Part 2 - detect cycles usefully
+
+After topological sort, if output count is smaller than job count, nodes with positive indegree are in or blocked by a cycle. Report those IDs.
+
+```python
+remaining = [job_id for job_id, count in indegree.items() if count > 0]
+if remaining:
+    raise CycleError(f"cycle involving: {remaining}")
+```
+
+### Part 3 - bounded parallelism
+
+Use a queue of ready jobs and at most N workers. When a job completes, decrement indegrees for dependents and enqueue newly ready jobs.
+
+Tradeoff: threads are fine for I/O-bound jobs. CPU-bound jobs need processes or an async/external worker system.
+
+### Part 4 - retry, backoff, and dependent skip
+
+Track job states: pending, running, succeeded, failed, skipped. A failed job after max retries causes all dependents that require it to be skipped.
+
+```python
+for attempt in range(max_attempts):
+    try:
+        run_job(job)
+        mark_succeeded(job)
+        break
+    except Exception:
+        sleep(backoff(attempt))
+else:
+    mark_failed(job)
+    skip_dependents(job)
+```
+
+Important interviewer point: dependents must not hang waiting for a dependency that will never succeed.
+
+## P8 - IP Address Iterator
+
+### Part 1 - iterate a CIDR block
+
+Use the standard `ipaddress` module. It handles parsing and integer conversion correctly.
+
+```python
+import ipaddress
+
+class CIDRIterator:
+    def __init__(self, cidr):
+        self.network = ipaddress.ip_network(cidr, strict=False)
+
+    def __iter__(self):
+        for address in self.network:
+            yield str(address)
+```
+
+Tradeoff: `network.hosts()` skips network and broadcast addresses for IPv4. The prompt says every address, so iterate over `network` directly.
+
+### Part 2 - multiple overlapping blocks without duplicates
+
+Keep a set of emitted integer addresses. This is fine for small inputs but not memory-flat.
+
+```python
+class MultiCIDRIterator:
+    def __iter__(self):
+        seen = set()
+        for cidr in self.cidrs:
+            for address in ipaddress.ip_network(cidr, strict=False):
+                value = int(address)
+                if value in seen:
+                    continue
+                seen.add(value)
+                yield str(address)
+```
+
+### Part 3 - lazy and memory-flat for /8
+
+Normalize CIDR blocks into integer intervals, sort and merge intervals, then lazily count from start to end. This avoids storing every IP.
+
+```python
+def cidr_to_interval(cidr):
+    network = ipaddress.ip_network(cidr, strict=False)
+    return int(network.network_address), int(network.broadcast_address)
+
+def merge_intervals(intervals):
+    intervals.sort()
+    merged = []
+    for start, end in intervals:
+        if not merged or start > merged[-1][1] + 1:
+            merged.append([start, end])
+        else:
+            merged[-1][1] = max(merged[-1][1], end)
+    return merged
+```
+
+Then yield each integer as an IP address:
+
+```python
+for start, end in merged:
+    for value in range(start, end + 1):
+        yield str(ipaddress.ip_address(value))
+```
+
+## P9 - Refactoring Drill
+
+### Part 1 - characterize existing behavior
+
+Before refactoring, add tests that lock down current behavior. The active tests do this for `order_report`.
+
+What to preserve:
+- cancelled rows are excluded
+- missing totals count as 0
+- missing customers are grouped as `"unknown"`
+- output shape stays `{"count", "total", "by_customer"}`
+
+### Part 2 - improve names and extract helpers
+
+Replace vague names with domain names. Extract small helpers only when they clarify intent.
+
+```python
+def is_counted_order(order):
+    return order.get("status") != "cancelled"
+
+def order_total(order):
+    return order.get("total", 0)
+
+def customer_name(order):
+    return order.get("customer", "unknown")
+```
+
+### Part 3 - fix the latent bug
+
+The likely bug is that non-numeric or `None` totals can break summing. Decide whether to reject invalid rows or coerce missing/None totals to 0.
+
+```python
+def order_total(order):
+    total = order.get("total", 0)
+    return 0 if total is None else total
+```
+
+State the policy clearly.
+
+### Part 4 - narrate tradeoffs
+
+Useful narration:
+- "I am first preserving behavior with characterization tests."
+- "Now I am renaming variables before changing logic so the code tells me what it does."
+- "I am extracting total/customer helpers because defaults are business rules."
+- "I am keeping the return shape stable because callers may rely on it."
+
+This drill is less about clever algorithms and more about showing controlled, low-risk improvement.
