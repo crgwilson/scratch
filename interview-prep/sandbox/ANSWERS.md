@@ -97,67 +97,139 @@ Historical reads before the delete still see old values. Reads at or after the d
 
 ## P2 - Resumable Iterator
 
-### Part 1 - batch source to item iterator
+### Part A - generic contract test
 
-Maintain a batch iterator plus an in-memory current batch and index. When the current batch is exhausted, load the next non-empty batch.
+Capture state before every call to `next()`, including the call that discovers
+exhaustion. Each state must work on a fresh iterator, so the test does not rely
+on the state's representation.
 
 ```python
-class ResumableIterator:
-    def __init__(self, source):
-        self.source = source
-        self.batch_iter = iter(source.batches_from(0))
-        self.current_batch = []
-        self.index_in_batch = 0
+import pytest
 
-    def __iter__(self):
-        return self
+def test_iterator(make_iter, expected_elements):
+    iterator = make_iter()
+    states = []
+    actual = []
+
+    while True:
+        states.append(iterator.checkpoint())
+        try:
+            actual.append(next(iterator))
+        except StopIteration:
+            break
+
+    assert actual == list(expected_elements)
+    assert iter(iterator) is iterator
+    with pytest.raises(StopIteration):
+        next(iterator)
+
+    for consumed, state in enumerate(states):
+        resumed = make_iter()
+        resumed.resume(state)
+        assert list(resumed) == list(expected_elements[consumed:])
+        with pytest.raises(StopIteration):
+            next(resumed)
+```
+
+In a pytest file, set `test_iterator.__test__ = False` if it is invoked as a
+helper; otherwise pytest will interpret its arguments as fixture names.
+
+### Part B - list iterator
+
+The next list position is an implementation detail. Although this implementation
+uses an integer, callers only store and return the opaque value.
+
+```python
+class ResumableListIterator(ResumableIterator):
+    def __init__(self, items: list):
+        self._items = items
+        self._index = 0
 
     def __next__(self):
-        while self.index_in_batch >= len(self.current_batch):
-            self.current_batch = next(self.batch_iter)
-            self.index_in_batch = 0
-        item = self.current_batch[self.index_in_batch]
-        self.index_in_batch += 1
+        if self._index >= len(self._items):
+            raise StopIteration
+        item = self._items[self._index]
+        self._index += 1
         return item
+
+    def checkpoint(self):
+        return self._index
+
+    def resume(self, state):
+        self._index = state
 ```
 
-### Part 2 - checkpoint and resume
+An interview-ready implementation may validate that `state` is an integer in
+`[0, len(items)]`, but validation is not essential to the core algorithm.
 
-The opaque token should encode position, not implementation objects. For example, JSON with `batch_index` and `index_in_batch`, base64-encoded if you want opacity.
+### Part C - multi-file iterator by composition
+
+The outer state is a pair: the current file index and that file iterator's
+opaque state. Do not inspect or reinterpret the inner state. The sentinel state
+`(len(paths), None)` represents complete exhaustion.
 
 ```python
-import json
+class ResumableMultiFileIterator(ResumableIterator):
+    def __init__(self, paths: list[str]):
+        self._paths = paths
+        self._file_index = 0
+        self._current = (
+            ResumableFileIterator(paths[0]) if paths else None
+        )
 
-def checkpoint(self):
-    return json.dumps({
-        "batch_index": self.batch_index,
-        "index_in_batch": self.index_in_batch,
-    })
+    def __next__(self):
+        while self._current is not None:
+            try:
+                return next(self._current)
+            except StopIteration:
+                self._file_index += 1
+                if self._file_index == len(self._paths):
+                    self._current = None
+                else:
+                    self._current = ResumableFileIterator(
+                        self._paths[self._file_index]
+                    )
+        raise StopIteration
 
-@classmethod
-def resume(cls, source, token):
-    state = json.loads(token)
-    iterator = cls(source)
-    iterator.batch_index = state["batch_index"]
-    iterator.index_in_batch = state["index_in_batch"]
-    iterator.batch_iter = iter(source.batches_from(iterator.batch_index))
-    iterator.current_batch = next(iterator.batch_iter, [])
-    return iterator
+    def checkpoint(self):
+        if self._current is None:
+            return (len(self._paths), None)
+        return (self._file_index, self._current.checkpoint())
+
+    def resume(self, state):
+        file_index, inner_state = state
+        self._file_index = file_index
+
+        if file_index == len(self._paths):
+            self._current = None
+            return
+
+        self._current = ResumableFileIterator(self._paths[file_index])
+        self._current.resume(inner_state)
 ```
 
-### Part 3 - source throws mid-batch
+The `while` loop is what handles any number of consecutive empty files. For
+local tests, replace `ResumableFileIterator` with `ResumableListIterator` and
+pass a list of per-file lists.
 
-Advance checkpoints only after an item is yielded successfully. If a batch fetch throws, keep the last committed position unchanged so retrying resumes from the last known safe point.
+### Part D - async version
 
-Tradeoff:
-- At-least-once iteration can duplicate on retry if checkpointing is loose.
-- Exactly-once requires durable position updates after every item or idempotent downstream handling.
+Use `__aiter__` and `async def __anext__`, awaiting the inner iterator's
+`__anext__()`. State capture must be serialized with reads - typically with an
+`asyncio.Lock` - so `checkpoint()` cannot observe a read after it starts but before
+the position commits. Another defensible contract forbids state capture while
+`__anext__()` is in flight.
 
-### Part 4 - source shrank after checkpoint
+### Verbal follow-ups
 
-If the saved batch or item index is now past the end, stop cleanly instead of raising an unrelated index error. In an interview, explain whether your token is offset-based or stable-id-based.
-
-Stable IDs are better when data can shrink or reorder. Offsets are simpler but fragile if the underlying dataset mutates.
+- If a file changes, byte offsets or record indexes may resume at the wrong
+  logical record. Store file identity/version metadata, require immutable files,
+  or use stable record IDs.
+- For persistence, encode the outer state plus the inner iterator's serializable
+  state as versioned JSON. Include enough source identity to reject incompatible
+  restores.
+- A resumable 2D iterator is the same composition: store the outer-list index
+  plus the inner-list iterator state, and skip empty inner lists with a loop.
 
 ## P3 - Rate Limiter
 

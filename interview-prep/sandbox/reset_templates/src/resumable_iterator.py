@@ -1,31 +1,47 @@
-# P2 - Resumable iterator over a large dataset
-#
-# Part 1:
-# * consume a source that yields items in batches.
-# * next(iterator) returns one item at a time across batch boundaries.
-#
-# Part 2:
-# * checkpoint() returns an opaque token.
-# * resume(token) continues exactly where it left off.
-#
-# Part 3:
-# * handle the source throwing mid-batch with no duplicated and no dropped items.
-#
-# Part 4:
-# * make resume work when the underlying source has shrunk since the checkpoint.
-class ResumableIterator:
-    def __init__(self, source) -> None:
-        raise NotImplementedError
+"""P2 - Resumable Iterator.
 
-    def __iter__(self):
+Implement Parts B and C without changing the public method signatures.
+
+Part A lives in tests/test_resumable_iterator.py: write one reusable contract
+test that can validate either implementation.
+
+Part B: implement ResumableListIterator.
+
+Part C: implement ResumableMultiFileIterator. Assume ResumableFileIterator is
+provided and conforms to the ResumableIterator interface. It accepts one path
+and yields the records in that JSON-lines file. For local practice, the tests
+replace it with ResumableListIterator and use lists as the "files."
+
+Part D (stretch): sketch or implement an async multi-file version and consider
+what checkpoint means while a read is in flight.
+"""
+
+from typing import Any, Generic, TypeVar
+
+
+T = TypeVar("T")
+
+class ResumableIterator(Generic[T]):
+    def __iter__(self) -> "ResumableIterator[T]":
         return self
 
-    def __next__(self):
+    def __next__(self) -> T:
         raise NotImplementedError
 
-    def checkpoint(self) -> str:
+    def checkpoint(self) -> Any:
+        """Return an opaque object representing the next element to yield."""
         raise NotImplementedError
 
-    @classmethod
-    def resume(cls, source, token: str) -> "ResumableIterator":
+    def resume(self, state: Any) -> None:
+        """Restore a state previously returned by this iterator type."""
+        raise NotImplementedError
+
+
+class ResumableListIterator(ResumableIterator[T]):
+    def __init__(self, items: list[T]) -> None:
+        raise NotImplementedError
+
+
+class ResumableMultiFileIterator(ResumableIterator[Any]):
+    def __init__(self, paths: list[str]) -> None:
         raise NotImplementedError
