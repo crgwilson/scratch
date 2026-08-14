@@ -1,6 +1,8 @@
 PYTHON ?= python3
 VENV ?= .venv
 BIN := $(VENV)/bin
+.DEFAULT_GOAL := help
+
 KEEP_TESTS := \
 	test_binary_search_tree.py \
 	test_cloud_sync.py \
