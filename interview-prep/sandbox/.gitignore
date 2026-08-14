@@ -3,8 +3,7 @@
 !ANSWERS.md
 !Makefile
 !pyproject.toml
-!reset_templates/
-!reset_templates/src/
-!reset_templates/src/*.py
 !src/
-!src/.gitkeep
+!src/*.py
+!tests/
+!tests/*.py
