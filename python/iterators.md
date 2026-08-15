@@ -108,3 +108,43 @@ class FibonacciIterator[int]:
         else:
             raise StopIteration
 ```
+## Doing it Async
+Async iterators are conceptually the same, but with a few key differences you need to remember! They have different magic methods you need to implement, which are just an "async" flavor of the original ones, and there is an async flavor of `StopIteration` (`StopAsyncIteration`).
+
+| Sync                  | Async                      |
+| --------------------- | -------------------------- |
+| `__iter__` -> `self`  | `__aiter__` -> `self`      |
+| `__next__`            | `async def __anext__`      |
+| `raise StopIteration` | `raise StopAsyncIteration` |
+| `for x in it`         | `async for x in it`        |
+```python
+import asyncio
+
+class AsyncCounter:
+	def __init__(self, limit: int) -> None:
+		self._limit = limit
+		self._i = 0
+		
+	def __aiter__(self) -> "AsyncCounter":  # Note: NOT ASYNC
+		return self
+		
+	async def __anext__(self) -> int:
+		if self._i >= self._limit:
+			raise StopAsyncIteration
+			
+		await asyncio.sleep(0.01)
+		self._i += 1
+		return self._i
+		
+		
+async def main() -> None:
+	async for n in AsyncCounter(3):
+		print(n)
+		
+		
+asyncio.run(main())
+```
+
+There are some gotchas worth knowing.
+- `StopIteration` inside a coroutine does not end the loop - it becomes a `RuntimeError`. Python deliberately blocks it because `StopIteration` already has a meaning inside generators.
+- There is no built-in `anext()` before Python 3.10 you can call `await anext(it)` and `await anext(it, default)`; below that, `await it.__anext__()` directly.
