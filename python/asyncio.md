@@ -6,6 +6,152 @@ tags:
 ---
 # Asyncio
 One of the like, three different libraries to write concurrent code with python
+## TL;DR
+**Run and Spawn**
+```python
+import asyncio
+
+async def work(n: int) -> int:
+	await asyncio.sleep(0.01)
+	return n * 2
+	
+
+async def main() -> None:
+	r = await work(1)                           # sequential
+	rs = await asyncio.gather(work(1), work(2)) # concurrent, ordered
+	t = asyncio.create_task(work(3))            # start now, await later
+	other_stuff()
+	r3 await t
+	
+	
+if __name__ == "__main__":
+	asyncio.run(main())                         # entry point, once
+```
+
+**TaskGroup**
+```python
+async def main() -> None:
+	async with asyncio.TaskGroup() as tg:
+		t1 = tg.create_task(work(1))
+		t2 = tg.create_task(work(2))
+	print(t1.result(), t2.result()) # both done here; result is an int
+```
+
+**Bounded Concurrency**
+```python
+from collections.abc import Iterable, Sequence
+
+async def fetch_all(urls: Sequence[str], limit: int = 10) -> list[str]:
+	sem = asyncio.Semaphore(limit)
+	
+	async def one(url: str) -> str:
+		async with sem:
+			return await fetch(url)
+			
+	return await asyncio.gather(*(one(u) for u in urls))
+```
+
+**Producer / Consumer**
+```python
+async def producer(q: asyncio.Queue[int], items: Iterable[int]) -> None:
+	for it in items:
+		await q.put(it)
+
+
+async def consumer(q: asyncio.Queue[int], out: list[int]) -> None:
+	while True:
+		item = await q.get()
+		try:
+			out.append(await work(item))
+		finally:
+			q.task_done()
+			
+
+async def main(items: Sequence[int], n_workers: int = 3) -> list[int]:
+	q = asyncio.Queue(maxsize=100)
+	out = []
+	workers = [
+		asyncio.create_task(consumer(q, out)) for _ in range(n_workers)
+	]
+	await producer(q, items)
+	await q.join()  # all task_done() called
+	for w in workers:
+		w.cancel()
+	return out
+```
+
+**Timeouts & Cancellation**
+```python
+async with asyncio.timeout(5):  # 3.11+
+	await slow()
+	
+r = await asyncio.wait_for(slow(), timeout=5)  # older; raises TimeoutError
+	
+t = asyncio.create_task(slow())
+t.cancel()
+try:
+	await t
+except asyncio.CancelledError:
+	pass
+```
+
+**Results as they finish**
+```python
+from colelctions.abc import Coroutine
+
+tasks = [asyncio.create_task(work(i)) for i in range(5)]
+
+for coro in asyncio.as_completed(tasks):
+	print(await coro)
+	
+done: set[asyncio.Task[int]]
+pending: set[asyncio.Task[int]]
+done, pending = await asyncio.wait(tasks, return_when=asyncio.FIRST_COMPLETED)
+```
+
+**Blocking code**
+```python
+def blocking_fn(arg: str) -> bytes: ...
+
+result = asyncio.to_thread(blocking_fn, "x")
+```
+
+**Sync Primitives**
+```python
+lock: asyncio.Lock = asyncio.Lock()            # async with lock:
+sem: asyncio.Semaphore = asyncio.Semaphore(10) # async with sem:
+ev: asyncio.Event = asyncio.Event().           # await ev.wait(); ev.set()
+```
+
+**Async Iterator Protocol**
+```python
+from typing import Self
+
+class Counter:
+	def __init__(self, limit: int) -> None:
+		self._limit = limit
+		self._i = 0
+		
+	def __aiter__(self) -> Self:     # NOT async
+		return self
+		
+	async def __anext__(self) -> int:
+		if self._i >= self._limit:
+			raise StopAsyncIteration # NOT StopIteration
+			
+		await asyncio.sleep(0.01)
+		self._i += 1
+		return self._i
+```
+...for return types use `AsyncIterator` from `collections`...
+```python
+from collections.abc import AsyncIterator
+
+async def acounter(limit: int) -> AsyncIterator[int]:
+	for i in range(limit):
+		await asyncio.sleep(0.01)
+		yield i
+```
 ## Asyncio: Basic usage
 Asyncio let's you stick the `async` keyword in from of any function and then call it
 using `asyncio.run()`. This runs your function in a [Coroutine](https://peps.python.org/pep-0492/).
