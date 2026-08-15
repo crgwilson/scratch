@@ -160,7 +160,6 @@ From there, you can `await` the result as you'd expect.
 ```python
 import asyncio
 
-
 async def main():
     print("Hello ...")
     await asyncio.sleep(1)
@@ -175,7 +174,6 @@ If you have a function which has not been marked as `async`, you can use `asynci
 ```python
 import asyncio
 import time
-
 
 def some_blocking_io():
     time.sleep(1)
@@ -214,7 +212,6 @@ Tasks can be used to concurrently schedule multiple coroutines. When your task i
 
 ```python
 import asyncio
-
 
 async def nested():
     return 42
