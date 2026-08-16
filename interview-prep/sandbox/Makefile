@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 .DEFAULT_GOAL := help
 
-.PHONY: venv test test-bst test-cloud-sync test-doubly-linked-list test-extended-lru-cache test-ip-address-iterator test-job-scheduler test-max-heap test-mini-sql test-rate-limiter test-refactoring-drill test-resumable-iterator test-singly-linked-list test-stdlib-drills test-time-kv reset clean help
+.PHONY: venv test test-bst test-cloud-sync test-doubly-linked-list test-extended-lru-cache test-ip-address-iterator test-job-scheduler test-max-heap test-mini-sql test-rate-limiter test-refactoring-drill test-resumable-iterator test-singly-linked-list test-stdlib-drills test-time-kv reset reset-% clean help
 
 venv: ## Bootstrap your venv
 	$(PYTHON) -m venv $(VENV)
@@ -66,5 +66,11 @@ reset: clean ## Reset the sandbox back to the defaults.
 	cp -R reset_templates/tests/. tests/
 	rm -rf $(VENV)
 
+reset-%: ## Reset one exercise's source and test (for example: reset-stdlib-drills)
+	test -f reset_templates/src/$(subst -,_,$*).py
+	test -f reset_templates/tests/test_$(subst -,_,$*).py
+	cp reset_templates/src/$(subst -,_,$*).py src/$(subst -,_,$*).py
+	cp reset_templates/tests/test_$(subst -,_,$*).py tests/test_$(subst -,_,$*).py
+
 help: ## Prints help for targets with comments
-	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
+	@cat $(MAKEFILE_LIST) | grep -E '^[a-zA-Z_%-]+:.*?## .*$$' | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
