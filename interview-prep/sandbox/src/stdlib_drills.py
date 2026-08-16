@@ -90,3 +90,35 @@ def recent_items(items: list[str], capacity: int) -> list[str]:
     reject a negative capacity with ``ValueError``.
     """
     raise NotImplementedError
+
+
+def parse_select_query(query: str) -> dict[str, object]:
+    """Parse a small SQL ``SELECT`` query using ``re`` capture groups.
+
+    Keywords must be matched case-insensitively and arbitrary whitespace or
+    newlines may separate tokens. Support this intentionally limited grammar:
+
+    * one or more comma-separated columns (or ``*``)
+    * one table name
+    * an optional ``WHERE`` containing simple predicates joined by ``AND``
+    * predicate operators ``=``, ``!=``, ``<>``, ``<``, ``<=``, ``>``, ``>=``
+    * an optional single-column ``ORDER BY`` with optional ``ASC``/``DESC``
+    * an optional integer ``LIMIT`` and optional trailing semicolon
+
+    Identifiers contain letters, numbers, or underscores and cannot start with
+    a number. Predicate values are unquoted numbers or single-quoted strings.
+    Return this shape, preserving identifier and value spelling from the query::
+
+        {
+            "columns": ["name", "age"],
+            "table": "users",
+            "where": [("active", "=", "1"), ("age", ">=", "21")],
+            "order_by": ("name", "ASC"),  # None when absent; ASC by default
+            "limit": 10,                  # None when absent
+        }
+
+    Strip surrounding quotes from string values. Raise ``ValueError`` when the
+    query is outside this grammar. Use named groups for the major clauses and
+    capture groups again when parsing each ``WHERE`` predicate.
+    """
+    raise NotImplementedError

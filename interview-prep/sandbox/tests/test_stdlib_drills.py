@@ -7,6 +7,7 @@ from stdlib_drills import (
     inventory_shortfall,
     merge_sorted_lists,
     most_common_words,
+    parse_select_query,
     recent_items,
     smallest_and_largest,
     top_k_largest,
@@ -96,3 +97,62 @@ def test_recent_items() -> None:
 def test_recent_items_rejects_negative_capacity() -> None:
     with pytest.raises(ValueError):
         recent_items(["a"], -1)
+
+
+def test_parse_select_query_with_all_clauses() -> None:
+    query = """
+        select name, email, login_count
+        from Users
+        where active = 1 AND plan = 'pro' and login_count >= 10
+        order by login_count desc
+        limit 25;
+    """
+    assert parse_select_query(query) == {
+        "columns": ["name", "email", "login_count"],
+        "table": "Users",
+        "where": [
+            ("active", "=", "1"),
+            ("plan", "=", "pro"),
+            ("login_count", ">=", "10"),
+        ],
+        "order_by": ("login_count", "DESC"),
+        "limit": 25,
+    }
+
+
+def test_parse_select_query_handles_optional_clauses() -> None:
+    assert parse_select_query("SELECT * FROM audit_log") == {
+        "columns": ["*"],
+        "table": "audit_log",
+        "where": [],
+        "order_by": None,
+        "limit": None,
+    }
+    assert parse_select_query("SeLeCt id FROM jobs OrDeR By created_at") == {
+        "columns": ["id"],
+        "table": "jobs",
+        "where": [],
+        "order_by": ("created_at", "ASC"),
+        "limit": None,
+    }
+
+
+def test_parse_select_query_supports_operators_and_negative_numbers() -> None:
+    query = "SELECT id FROM readings WHERE temperature < -2.5 AND status != 'bad'"
+    assert parse_select_query(query)["where"] == [
+        ("temperature", "<", "-2.5"),
+        ("status", "!=", "bad"),
+    ]
+
+
+@pytest.mark.parametrize(
+    "query",
+    [
+        "SELECT id users",
+        "SELECT id FROM users WHERE active IN (1, 2)",
+        "SELECT id FROM users LIMIT many",
+    ],
+)
+def test_parse_select_query_rejects_unsupported_sql(query: str) -> None:
+    with pytest.raises(ValueError):
+        parse_select_query(query)
