@@ -3,7 +3,7 @@ VENV ?= .venv
 BIN := $(VENV)/bin
 .DEFAULT_GOAL := help
 
-.PHONY: venv test test-bst test-cloud-sync test-doubly-linked-list test-extended-lru-cache test-ip-address-iterator test-job-scheduler test-max-heap test-mini-sql test-rate-limiter test-refactoring-drill test-resumable-iterator test-singly-linked-list test-stdlib-drills test-time-kv reset reset-% clean help
+.PHONY: venv test test-asyncio-drills test-bst test-cloud-sync test-doubly-linked-list test-extended-lru-cache test-ip-address-iterator test-job-scheduler test-max-heap test-mini-sql test-rate-limiter test-refactoring-drill test-resumable-iterator test-singly-linked-list test-stdlib-drills test-time-kv reset reset-% clean help
 
 venv: ## Bootstrap your venv
 	$(PYTHON) -m venv $(VENV)
@@ -54,6 +54,9 @@ test-refactoring-drill: venv ## Run refactoring drill characterization tests
 
 test-stdlib-drills: venv ## Run standard-library drills
 	$(BIN)/pytest tests/test_stdlib_drills.py
+
+test-asyncio-drills: venv ## Run asyncio drills
+	$(BIN)/pytest tests/test_asyncio_drills.py
 
 clean: ## Cleanup cache files such as pycache, pyc, etc
 	find . -type d \( -name "__pycache__" -o -name ".pytest_cache" \) -prune -exec rm -rf {} +
