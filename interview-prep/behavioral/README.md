@@ -18,7 +18,14 @@ We believe that AI will have broad societal impact before AGI, and we'll strive 
 We will actively cooperate with other research and policy institutions; we seek to create a global community working together to address AGS's global challenges.
 
 We are committed to providing public goods that help society navigate the path to AGI. Today this includes most of our AI research, but we expect that safety and security concerns will reduce our traditional publishing in future, while increasing the importance of sharing safety, policy, and standards research.
-
+## Culture
+- **Speed under ambiguity** - shipping something valuable when the spec was unclear and the ground was moving. This is probably the single highest frequency theme.
+- **Scope judgement** - what you cut, what you refused to build, when you said "this isn't worth it".
+- **Disagreement** - with a peer, a manager, or a PM. They want to see you hold a position on technical merit and then commit either way.
+- **Failure ownership** - an outage, a bad architectural call, a project that died. Non-defensive, specific, with the lesson operationalized.
+- **Impact without authority** - you got a change adopted across teams you didn't own.
+- **Judgement on safety / misuse** - given their mission, a moment where you flagged a risk or privacy issue, or an "we can build this, but should we?" lands very well if you have one. Most candidates don't prepare this.
+- **Motivation** - Why OpenAI? Needs to be specific enough that it cannot be copy pasted into an Anthropic or DeepMind application. Vague AGI enthusiasm reads as unserious.
 ## STAR Method
 **S - Situation:** The context. Where were you, what the team was, what was at stake?
 **T - Task:** What was specifically on _you_. Not what the team was doing - your responsibility or decision you owned.
@@ -29,6 +36,7 @@ We are committed to providing public goods that help society navigate the path t
 	**A:**  Broadly distribute benefits - AI, and specifically AGI presents risk to our current way of living. That risk not necessarily being a sky-net-esque robot uprising, but moreso the further concentration of labor into a certain class of people. Coming from a lower-middle class family from a small town, this appeals to me since it ensures folks like that stand to benefit from AGI. Cooperative orientation - similar to the first point, it shows commitment to the ultimate goal of AGI while focusing on the security of society.
 - **Q:** Where do you see yourself in five years and how does OpenAI fit into that?
 - **Q:** Why now?
+	- **A:** Microsoft has been driving a lot of restructuring within LinkedIn for the past several years, which has created a lot of noise for us. My current project is in more of an incubator and our strategic direction has shifted more than once which has led to a lot of churn and rebuilding the same thing a few times. I'm fine with uncertainty, I think I thrive in it, but what I want is for that uncertainty to come from a hard technical problem or an ambitious goal to achieve, not whether or not the work will be there in two quarters.
 - **Q:** Why not Anthropic / Deepmind / Meta?
 	- **A:** OpenAI is mission focused on AGI while ensuring it is used to the benefit of humanity. Other competitors are not.
 		- Meta is floundering trying to stay relevant after the metaverse failed.
